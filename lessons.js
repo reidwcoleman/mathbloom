@@ -115,11 +115,11 @@ const UNITS = [
     tint: "tint-peach",
     blurb: "Scaled copies, scale factors, maps, and how scaling changes area.",
     lessons: [
-      // ================ U4 L1 ================
+      // ================ U4 L1 — Session 1 ================
       {
         id: "u4l1",
         title: "Scaled Copies & Scale Factors",
-        blurb: "What makes a copy 'scaled', and the one number that controls it all.",
+        blurb: "What makes a copy “scaled,” the one number behind it, and how to build one yourself.",
         pages: [
           {
             title: "Same shape, new size",
@@ -165,10 +165,118 @@ const UNITS = [
                 <p>A 2×4 rectangle becomes a 4×12 rectangle. Scaled copy?</p>
                 <p>Widths: 4 ÷ 2 = <strong>2</strong>. &nbsp;Lengths: 12 ÷ 4 = <strong>3</strong>.</p>
                 <p>Different numbers → <strong>not</strong> a scaled copy. It got stretched, not scaled.</p>
+              </div>`
+          },
+          {
+            title: "Making a scaled copy",
+            html: `
+              <p>Building one yourself is the same idea, run forward: pick a scale factor, then multiply <em>every</em> length by it.</p>
+              <div class="example"><span class="tag">Worked example</span>
+                <p>Make a scaled copy of a 5 cm × 3 cm rectangle with a scale factor of <strong>2</strong>.</p>
+                <p>New width: <span class="math">5 × 2 = 10 cm</span>. &nbsp; New height: <span class="math">3 × 2 = 6 cm</span>.</p>
+                <p>That's it — a 10 cm × 6 cm rectangle, same shape, twice as big.</p>
               </div>
-              <p>That's the whole lesson: one number, multiplied everywhere, checked everywhere. You're ready to practice. 🌸</p>`
+              <div class="key-idea"><span class="tag">The one rule</span>
+                Every length × the same scale factor. Miss even one side and it's a stretch, not a scaled copy.
+              </div>`,
+            checkpoint: {
+              q: "You scale a 6 cm by 4 cm rectangle by a factor of ½. What are the new side lengths?",
+              options: ["3 cm by 2 cm", "12 cm by 8 cm", "6.5 cm by 4.5 cm"],
+              correct: 0,
+              why: "Multiply each side by ½ (the same as cutting in half): 6 × ½ = 3 and 4 × ½ = 2. A factor below 1 shrinks the copy."
+            }
+          },
+          {
+            title: "Putting it together",
+            html: `
+              <p>You can now do the three things this lesson is built on:</p>
+              <ul>
+                <li><strong>Find</strong> a scale factor → divide copy ÷ original.</li>
+                <li><strong>Use</strong> it to find a missing side → multiply (forward) or divide (backward).</li>
+                <li><strong>Test</strong> whether something is a true scaled copy → every pair of sides gives the same factor.</li>
+              </ul>
+              <p>Next, in <strong>Work it through</strong>, we'll do one of each together, step by step. Then the Practice garden is your turn. 🌸</p>`
           }
         ],
+        guided: {
+          intro: `In this lesson you learned to <strong>find</strong>, <strong>use</strong>, and <strong>test</strong> scale factors. Let's do one of each together — I'll ask one small question at a time.`,
+          problems: [
+            {
+              title: "Find the scale factor",
+              context: `<p>Rectangle <strong>B</strong> is a scaled copy of Rectangle <strong>A</strong>. Their measurements are shown below.</p>`,
+              visual: svgScaledRects(4, 2, 3),
+              steps: [
+                {
+                  prompt: `To find the scale factor, what do we do with a pair of <em>matching</em> sides?`,
+                  type: "choice",
+                  choices: ["Add: copy + original", "Divide: copy ÷ original", "Subtract: original − copy"],
+                  answer: 1,
+                  hint: `Scale factor = side in the copy ÷ matching side in the original.`,
+                  teach: `Dividing copy ÷ original tells you how many times bigger the copy is. Adding or subtracting would mix up units and lose the “times bigger” idea.`
+                },
+                {
+                  prompt: `Use the widths. A's width is 4 cm and B's width is 12 cm. What is 12 ÷ 4?`,
+                  type: "numeric", answer: 3,
+                  hint: `How many 4's fit into 12?`,
+                  teach: `12 ÷ 4 = <strong>3</strong>. Every length in B is 3 times the matching length in A.`
+                },
+                {
+                  prompt: `Check with the heights: 6 ÷ 2 = 3 — the same number. So is B a true scaled copy of A?`,
+                  type: "choice",
+                  choices: ["Yes — every pair of sides gives 3", "No — the sides don't match"],
+                  answer: 0,
+                  teach: `Both pairs of sides give the same scale factor (3), which is exactly the scaled-copy test. ✓`
+                }
+              ],
+              recap: `<p>Scale factor = copy ÷ original = <strong>3</strong>, confirmed by every pair of sides.</p>`
+            },
+            {
+              title: "Use the scale factor to find a missing side",
+              context: `<p>An artist scales a logo by a factor of <strong>2.5</strong>. One side of the original logo is <strong>6 cm</strong> long.</p>`,
+              steps: [
+                {
+                  prompt: `Going from the original to the bigger copy — do we multiply or divide by the scale factor?`,
+                  type: "choice",
+                  choices: ["Multiply (the copy is bigger)", "Divide (the copy is smaller)"],
+                  answer: 0,
+                  hint: `The scale factor 2.5 is greater than 1, so the copy grows.`,
+                  teach: `Original → copy means <strong>multiply</strong> by the scale factor, because the copy is larger.`
+                },
+                {
+                  prompt: `So the matching side in the copy is 6 × 2.5 = ?`,
+                  type: "numeric", answer: 15, unit: "cm",
+                  hint: `6 × 2 = 12, and 6 × 0.5 = 3. Add them.`,
+                  teach: `6 × 2.5 = <strong>15 cm</strong>. The copy's side is 2.5 times the original's.`
+                }
+              ],
+              recap: `<p>Original × scale factor = copy: 6 × 2.5 = <strong>15 cm</strong>.</p>`
+            },
+            {
+              title: "Test it: scaled copy, or stretched?",
+              context: `<p>A 2 cm × 5 cm rectangle becomes a 6 cm × 10 cm rectangle. Is the new one a true scaled copy?</p>`,
+              steps: [
+                {
+                  prompt: `Scale factor from the short sides: 6 ÷ 2 = ?`,
+                  type: "numeric", answer: 3,
+                  teach: `The short side tripled: 6 ÷ 2 = <strong>3</strong>.`
+                },
+                {
+                  prompt: `Scale factor from the long sides: 10 ÷ 5 = ?`,
+                  type: "numeric", answer: 2,
+                  teach: `The long side only doubled: 10 ÷ 5 = <strong>2</strong>.`
+                },
+                {
+                  prompt: `The two sides gave 3 and 2 — different numbers. So the new rectangle is…`,
+                  type: "choice",
+                  choices: ["a true scaled copy", "stretched, not scaled"],
+                  answer: 1,
+                  teach: `Because the pairs of sides give different scale factors, it isn't a scaled copy — it got stretched in one direction. A real scaled copy needs the <em>same</em> factor everywhere.`
+                }
+              ],
+              recap: `<p>Different scale factors (3 vs 2) → <strong>not</strong> a scaled copy. The test catches stretches every time.</p>`
+            }
+          ]
+        },
         generate() {
           const v = ri(1, 4);
           if (v === 1) {
@@ -241,11 +349,430 @@ const UNITS = [
           };
         }
       },
-      // ================ U4 L2 ================
+      // ================ U4 L2 — Session 2 ================
       {
         id: "u4l2",
+        title: "Scaled Relationships & the Size of the Scale Factor",
+        blurb: "Angles stay put, every length shares one factor, and the factor's size tells the whole story.",
+        pages: [
+          {
+            title: "Angles don't move",
+            html: `
+              <p>When you scale a figure, the lengths change — but the <strong>angles stay exactly the same</strong>. A scaled copy is the same shape, and "same shape" means the corners match perfectly.</p>
+              <div class="key-idea"><span class="tag">Key idea</span>
+                Scaling stretches or shrinks <strong>lengths</strong>. It never changes <strong>angles</strong>.
+              </div>
+              <p>So if a triangle has a 90° corner, every scaled copy of it has a 90° corner too — whether it's twice as big or half as small.</p>`
+          },
+          {
+            title: "Every length, one factor",
+            html: `
+              <p>In a real scaled copy, <em>all</em> the lengths use the very same scale factor — not just the outside edges. Diagonals, heights, even the distance between two marked points all scale by the same number.</p>
+              <div class="example"><span class="tag">Worked example</span>
+                <p>A figure is scaled by <strong>3</strong>. A side that was 5 cm becomes 15 cm. A diagonal that was 8 cm becomes…</p>
+                <p><span class="math">8 × 3 = 24 cm</span>. Same factor, every length.</p>
+              </div>`,
+            checkpoint: {
+              q: "Triangle B is a scaled copy of Triangle A. A 50° angle in A corresponds to what angle in B?",
+              options: ["25°", "50°", "100°"],
+              correct: 1,
+              why: "Angles never change when you scale — only lengths do. The matching angle is still 50°."
+            }
+          },
+          {
+            title: "What the size of the factor tells you",
+            html: `
+              <p>The scale factor's <em>size</em> is a quick story about the copy, before you compute anything:</p>
+              <ul>
+                <li><strong>Bigger than 1</strong> → the copy is an enlargement (2 = twice as big).</li>
+                <li><strong>Between 0 and 1</strong> → the copy is a reduction (½ = half as big).</li>
+                <li><strong>Exactly 1</strong> → same size, a perfect duplicate.</li>
+              </ul>
+              <div class="key-idea"><span class="tag">Handy sense-check</span>
+                The closer the factor is to 0, the tinier the copy. The bigger the factor, the more it grows.
+              </div>`,
+            checkpoint: {
+              q: "Which scale factor makes the SMALLEST copy?",
+              options: ["3", "1", "¼"],
+              correct: 2,
+              why: "¼ is the only factor below 1, so it's the only one that shrinks — and shrinks to a quarter-size. Factors of 1 and 3 keep it the same or grow it."
+            }
+          },
+          {
+            title: "Going backwards",
+            html: `
+              <p>You can run the relationship in reverse. If a copy was made by <em>multiplying</em> by a factor, then going from the copy back to the original means <em>dividing</em> by it.</p>
+              <div class="example"><span class="tag">Worked example</span>
+                <p>A copy was made with scale factor <strong>4</strong>. A side of the copy is 20 cm. The matching original side is <span class="math">20 ÷ 4 = 5 cm</span>.</p>
+              </div>
+              <div class="key-idea"><span class="tag">Reciprocal idea</span>
+                Original → copy uses factor 4. Copy → original uses factor <span class="math">¼</span>. They're reciprocals: 4 and ¼, or 2 and ½.
+              </div>`
+          },
+          {
+            title: "Putting it together",
+            html: `
+              <p>You've now got the full picture of <em>what changes and what stays</em>:</p>
+              <ul>
+                <li>Angles: <strong>unchanged</strong>.</li>
+                <li>Lengths: all scale by the <strong>same</strong> factor.</li>
+                <li>Factor size: tells you grow / shrink / same at a glance.</li>
+                <li>Backwards: divide instead of multiply (the reciprocal factor).</li>
+              </ul>
+              <p>Let's work through these together next. 🪴</p>`
+          }
+        ],
+        guided: {
+          intro: `This lesson is about <strong>what changes and what stays the same</strong> when you scale. Let's walk through a few together.`,
+          problems: [
+            {
+              title: "Angles stay, lengths scale",
+              context: `<p>Triangle <strong>B</strong> is a scaled copy of Triangle <strong>A</strong> with a scale factor of <strong>3</strong>. In Triangle A, one angle is <strong>40°</strong> and one side is <strong>5 cm</strong>.</p>`,
+              steps: [
+                {
+                  prompt: `What is the matching angle in Triangle B?`,
+                  type: "numeric", answer: 40, unit: "°",
+                  hint: `Does scaling change angles, or only lengths?`,
+                  teach: `Still <strong>40°</strong>. Scaling never touches angles — only lengths grow or shrink.`
+                },
+                {
+                  prompt: `What is the matching side in Triangle B? (5 × 3)`,
+                  type: "numeric", answer: 15, unit: "cm",
+                  teach: `5 × 3 = <strong>15 cm</strong>. The length scales by the factor; the angle stayed put.`
+                }
+              ],
+              recap: `<p>Same shape: angle unchanged (40°), length tripled (15 cm).</p>`
+            },
+            {
+              title: "Read the size of the factor",
+              context: `<p>Let's compare a few scale factors without computing anything — just reading their size.</p>`,
+              steps: [
+                {
+                  prompt: `A scale factor of <strong>½</strong> — is the copy bigger, smaller, or the same size?`,
+                  type: "choice",
+                  choices: ["Bigger", "Smaller", "Same size"],
+                  answer: 1,
+                  teach: `½ is between 0 and 1, so it shrinks the figure to half-size — <strong>smaller</strong>.`
+                },
+                {
+                  prompt: `A scale factor of exactly <strong>1</strong> — bigger, smaller, or the same?`,
+                  type: "choice",
+                  choices: ["Bigger", "Smaller", "Same size"],
+                  answer: 2,
+                  teach: `Multiplying every length by 1 changes nothing — the copy is the <strong>same size</strong>.`
+                }
+              ],
+              recap: `<p>Below 1 shrinks · exactly 1 stays · above 1 grows. You can tell at a glance.</p>`
+            },
+            {
+              title: "Run it backwards",
+              context: `<p>Copy <strong>B</strong> was made from original <strong>A</strong> using a scale factor of <strong>4</strong>. A side of <strong>B</strong> is <strong>20 cm</strong>.</p>`,
+              steps: [
+                {
+                  prompt: `To get back from the copy to the original, do we multiply or divide by 4?`,
+                  type: "choice",
+                  choices: ["Multiply (it gets bigger)", "Divide (it gets smaller)"],
+                  answer: 1,
+                  hint: `The original is smaller than this enlarged copy.`,
+                  teach: `Copy → original means <strong>divide</strong>, undoing the multiplication that made the copy.`
+                },
+                {
+                  prompt: `So the matching side of the original is 20 ÷ 4 = ?`,
+                  type: "numeric", answer: 5, unit: "cm",
+                  teach: `20 ÷ 4 = <strong>5 cm</strong>. Going from B back to A uses the reciprocal factor, ¼.`
+                }
+              ],
+              recap: `<p>Forward used ×4; backward uses ÷4 (factor ¼). 20 ÷ 4 = <strong>5 cm</strong>.</p>`
+            }
+          ]
+        },
+        generate() {
+          const v = ri(1, 4);
+          if (v === 1) {
+            const f = pick([0.5, 0.75, 2, 3, 1, 1.5, 0.25]);
+            const correct = f < 1 ? 1 : (f === 1 ? 2 : 0);
+            return {
+              prompt: `A scaled copy is made with a scale factor of <span class="math">${fshow(f)}</span>. Compared with the original, the copy is…`,
+              type: "choice",
+              choices: ["larger", "smaller", "exactly the same size"],
+              correctIndex: correct,
+              hints: [
+                "Compare the scale factor to 1.",
+                "Greater than 1 grows · between 0 and 1 shrinks · exactly 1 stays the same."
+              ],
+              steps: [
+                `The scale factor ${fshow(f)} is ${f < 1 ? "between 0 and 1, so the copy is <strong>smaller</strong>" : f === 1 ? "exactly 1, so the copy is the <strong>same size</strong>" : "greater than 1, so the copy is <strong>larger</strong>"}.`
+              ]
+            };
+          }
+          if (v === 2) {
+            const a = pick([25, 30, 35, 40, 50, 55, 65, 70, 80, 110]);
+            const f = pick([2, 3, 0.5, 1.5]);
+            return {
+              prompt: `Triangle B is a scaled copy of Triangle A using a scale factor of <span class="math">${fshow(f)}</span>. One angle in Triangle A measures <span class="math">${a}°</span>. What is the matching angle in Triangle B?`,
+              type: "numeric", answer: a, unit: "°",
+              hints: [
+                "Scaling changes lengths, not angles.",
+                "Corresponding angles in a scaled copy are exactly equal."
+              ],
+              steps: [
+                `A scale factor stretches or shrinks lengths but leaves every angle unchanged.`,
+                `So the matching angle is still <strong>${a}°</strong>.`
+              ]
+            };
+          }
+          if (v === 3) {
+            const f = pick([2, 3, 4, 1.5, 0.5]);
+            const s = (f === 0.5 || f === 1.5) ? pick([4, 6, 8, 10, 12]) : ri(3, 9);
+            return {
+              prompt: `A figure is scaled by a factor of <span class="math">${fshow(f)}</span>. A side of the original is <span class="math">${s} cm</span>. How long is the matching side in the copy?`,
+              type: "numeric", answer: s * f, unit: "cm",
+              hints: [
+                "Original → copy: multiply by the scale factor.",
+                `Multiply ${s} × ${fshow(f)}.`
+              ],
+              steps: [
+                `Every length in the copy = original × scale factor.`,
+                `${s} × ${fshow(f)} = <strong>${clean(s * f)} cm</strong>.`
+              ]
+            };
+          }
+          const f = pick([2, 3, 4, 5]);
+          const orig = ri(3, 9);
+          const copySide = orig * f;
+          return {
+            prompt: `A copy was made from an original using a scale factor of <span class="math">${f}</span>. A side of the <em>copy</em> is <span class="math">${copySide} cm</span>. How long is the matching side of the <em>original</em>?`,
+            type: "numeric", answer: orig, unit: "cm",
+            hints: [
+              "Copy → original is the reverse, so divide.",
+              `Divide ${copySide} ÷ ${f}.`
+            ],
+            steps: [
+              `Copy = original × ${f}, so original = copy ÷ ${f}.`,
+              `${copySide} ÷ ${f} = <strong>${orig} cm</strong>.`,
+              `Check: ${orig} × ${f} = ${copySide}. ✓`
+            ]
+          };
+        }
+      },
+      // ================ U4 L3 — Session 3 ================
+      {
+        id: "u4l3",
+        title: "Scaling & Area",
+        blurb: "The sneaky squared rule: scale lengths by 3, and area grows by 9.",
+        pages: [
+          {
+            title: "Area breaks the pattern",
+            html: `
+              <p>Here's a fun surprise. Scale a 2 × 3 rectangle by a factor of 2:</p>
+              <div class="teach-visual">${svgScaledRects(3, 2, 2)}</div>
+              <p>The sides doubled… but count the space inside. The original holds <span class="math">2 × 3 = 6</span> squares. The copy holds <span class="math">4 × 6 = 24</span> squares. The area didn't double — it got <strong>4 times</strong> bigger!</p>
+              <div class="key-idea"><span class="tag">Key idea</span>
+                scale factor <span class="math">s</span> → area is multiplied by <span class="math">s × s = s²</span>
+              </div>`
+          },
+          {
+            title: "Why squared?",
+            html: `
+              <p>Area is two lengths multiplied together — like width × height. When you scale, <em>both</em> of those lengths get multiplied by <span class="math">s</span>:</p>
+              <div class="example"><span class="tag">See it happen</span>
+                <p>new area = (w × s) × (h × s) = (w × h) × <strong>s × s</strong></p>
+                <p>The scale factor sneaks in twice. That's the whole secret.</p>
+              </div>
+              <div class="example"><span class="tag">Worked example</span>
+                <p>A 2 cm × 3 cm rectangle (area 6 cm²) is scaled by 3.</p>
+                <p>New sides: 6 cm × 9 cm. New area: <span class="math">6 × 9 = 54 cm²</span>.</p>
+                <p>Rule check: 6 × 3² = 6 × 9 = 54. ✓</p>
+              </div>`,
+            checkpoint: {
+              q: "Every side of a sticker is scaled by 4 to make a poster. The poster's area is how many times the sticker's?",
+              options: ["4 times", "8 times", "16 times"],
+              correct: 2,
+              why: "Area multiplies by the scale factor squared: 4² = 16. (Doubling to 8 is a really common first instinct — the squared rule takes a little while to feel natural.)"
+            }
+          },
+          {
+            title: "Shrinking squares too",
+            html: `
+              <p>The squared rule works for shrinking just the same:</p>
+              <ul>
+                <li>Scale factor <span class="math">½</span> → area is multiplied by <span class="math">½ × ½ = ¼</span>. Quarter, not half!</li>
+                <li>Scale factor <span class="math">⅓</span> → area becomes <span class="math">⅑</span> of the original.</li>
+              </ul>
+              <div class="key-idea"><span class="tag">Going backwards</span>
+                If the <em>area</em> got multiplied by 9, the scale factor was <span class="math">3</span> — ask "what number times itself gives 9?"
+              </div>`
+          },
+          {
+            title: "Using the rule both ways",
+            html: `
+              <p>Two directions, one rule:</p>
+              <div class="example"><span class="tag">Lengths → area</span>
+                <p>Area 5 cm², scaled by 4. New area = 5 × 4² = 5 × 16 = <strong>80 cm²</strong>.</p>
+              </div>
+              <div class="example"><span class="tag">Area → length factor</span>
+                <p>An area grew by a factor of 25. Length factor = the number that squares to 25 → <strong>5</strong>.</p>
+              </div>
+              <div class="key-idea"><span class="tag">Remember</span>
+                Forward: square the length factor. Backward: "un-square" the area factor (find what times itself gives it).
+              </div>`,
+            checkpoint: {
+              q: "A figure's area becomes 9 times larger after scaling. What was the scale factor for the side lengths?",
+              options: ["3", "9", "81"],
+              correct: 0,
+              why: "Area scales by the factor squared, so we need s² = 9, which means s = 3 (because 3 × 3 = 9)."
+            }
+          },
+          {
+            title: "Putting it together",
+            html: `
+              <p>The whole lesson in one breath: <strong>lengths once, areas twice.</strong></p>
+              <ul>
+                <li>Scale length by s → area scales by s².</li>
+                <li>Shrinking counts too (½ → ¼).</li>
+                <li>To go from an area factor back to a length factor, un-square it.</li>
+              </ul>
+              <p>Let's work a few together, then you'll grow the flower in Practice. 📐</p>`
+          }
+        ],
+        guided: {
+          intro: `The big idea here is <strong>lengths once, areas twice</strong> (s → s²). Let's see it, then use it both ways.`,
+          problems: [
+            {
+              title: "Count it for yourself",
+              context: `<p>A 2 cm × 3 cm rectangle (area 6 cm²) is scaled by a factor of <strong>2</strong>.</p>`,
+              visual: svgScaledRects(3, 2, 2),
+              steps: [
+                {
+                  prompt: `The new sides are 4 cm and 6 cm. What is the new area? (4 × 6)`,
+                  type: "numeric", answer: 24, unit: "cm²",
+                  teach: `4 × 6 = <strong>24 cm²</strong>.`
+                },
+                {
+                  prompt: `How many times bigger is the new area than the old 6 cm²? (24 ÷ 6)`,
+                  type: "numeric", answer: 4,
+                  teach: `24 ÷ 6 = <strong>4</strong>. The sides doubled, but the area quadrupled.`
+                },
+                {
+                  prompt: `We scaled lengths by 2, and the area grew by 4. Notice that 4 = 2 × 2. So area scales by…`,
+                  type: "choice",
+                  choices: ["the scale factor", "the scale factor squared"],
+                  answer: 1,
+                  teach: `Area scales by the <strong>scale factor squared</strong> (s²), because area uses two lengths and each one scales.`
+                }
+              ],
+              recap: `<p>Length factor 2 → area factor 2² = 4. New area 24 cm².</p>`
+            },
+            {
+              title: "Use the rule forward",
+              context: `<p>A shape has an area of <strong>5 cm²</strong>. It's scaled by a factor of <strong>3</strong>.</p>`,
+              steps: [
+                {
+                  prompt: `First, what is the area multiplier? (3²)`,
+                  type: "numeric", answer: 9,
+                  hint: `3 squared means 3 × 3.`,
+                  teach: `3² = 9, so the area becomes 9 times larger.`
+                },
+                {
+                  prompt: `Now the new area: 5 × 9 = ?`,
+                  type: "numeric", answer: 45, unit: "cm²",
+                  teach: `5 × 9 = <strong>45 cm²</strong>. Lengths tripled; area grew nine-fold.`
+                }
+              ],
+              recap: `<p>New area = original × s² = 5 × 9 = <strong>45 cm²</strong>.</p>`
+            },
+            {
+              title: "Use the rule backward",
+              context: `<p>After scaling, a photo's <strong>area</strong> is <strong>16 times</strong> bigger than before. What was the scale factor for the side lengths?</p>`,
+              steps: [
+                {
+                  prompt: `Area scales by s², and here s² = 16. To find s, we ask…`,
+                  type: "choice",
+                  choices: ["What is 16 × 16?", "What number times itself gives 16?"],
+                  answer: 1,
+                  teach: `Since area = s², we “un-square” 16 — we look for the number that, times itself, makes 16.`
+                },
+                {
+                  prompt: `What number times itself equals 16?`,
+                  type: "numeric", answer: 4,
+                  hint: `Try 4 × 4.`,
+                  teach: `4 × 4 = 16, so the length scale factor was <strong>4</strong>.`
+                }
+              ],
+              recap: `<p>Area factor 16 → length factor √16 = <strong>4</strong>.</p>`
+            }
+          ]
+        },
+        generate() {
+          const v = ri(1, 4);
+          if (v === 1) {
+            const s = pick([2, 3, 4, 5]);
+            const A = ri(3, 9);
+            return {
+              prompt: `A figure has an area of <span class="math">${A} cm²</span>. A scaled copy is made with a scale factor of <span class="math">${s}</span>. What is the area of the copy?`,
+              type: "numeric", answer: A * s * s, unit: "cm²",
+              hints: [
+                `Lengths multiply by ${s}, but area multiplies by ${s}².`,
+                `Area of copy = ${A} × ${s} × ${s}.`
+              ],
+              steps: [
+                `Scale factor ${s} → area multiplies by ${s}² = ${s * s}.`,
+                `${A} × ${s * s} = <strong>${A * s * s} cm²</strong>.`
+              ]
+            };
+          }
+          if (v === 2) {
+            const s = pick([2, 3, 4, 5, 10]);
+            return {
+              prompt: `Every side of a figure is scaled by a factor of <span class="math">${s}</span>. The area of the copy is how many times the area of the original?`,
+              type: "numeric", answer: s * s,
+              hints: [
+                "Area uses two dimensions, so the scale factor gets applied twice.",
+                `Compute ${s} × ${s}.`
+              ],
+              steps: [
+                `Area multiplies by the scale factor squared.`,
+                `${s}² = ${s} × ${s} = <strong>${s * s}</strong> times the original area.`
+              ]
+            };
+          }
+          if (v === 3) {
+            const A = pick([8, 12, 16, 20, 24, 40]);
+            return {
+              prompt: `A poster has an area of <span class="math">${A} in²</span>. A mini version is printed at a scale factor of <span class="math">½</span>. What is the area of the mini poster?`,
+              type: "numeric", answer: A / 4, unit: "in²",
+              hints: [
+                "With a scale factor of ½, area is multiplied by ½ × ½ = ¼.",
+                `Find one quarter of ${A}.`
+              ],
+              steps: [
+                `Scale factor ½ → area multiplies by (½)² = ¼.`,
+                `${A} × ¼ = <strong>${clean(A / 4)} in²</strong>.`
+              ]
+            };
+          }
+          const s = pick([2, 3, 4, 5]);
+          const A = pick([2, 3, 4, 5]);
+          return {
+            prompt: `A small garden plot has an area of <span class="math">${A} m²</span>. A scaled-up plot has an area of <span class="math">${A * s * s} m²</span>. What was the <strong>scale factor</strong> for the side lengths?`,
+            type: "numeric", answer: s,
+            hints: [
+              `First find what the area was multiplied by: ${A * s * s} ÷ ${A} = ${s * s}.`,
+              `Now ask: what number times itself gives ${s * s}?`
+            ],
+            steps: [
+              `Area multiplier = ${A * s * s} ÷ ${A} = ${s * s}.`,
+              `Area multiplies by s², so s² = ${s * s} → s = <strong>${s}</strong>.`,
+              `Check: ${s} × ${s} = ${s * s}. ✓`
+            ]
+          };
+        }
+      },
+      // ================ U4 L4 — Session 4 ================
+      {
+        id: "u4l4",
         title: "Scale Drawings & Maps",
-        blurb: "Turn map centimeters into real-world kilometers (and back again).",
+        blurb: "Turn map centimeters into real-world kilometers — and draw real spaces to scale.",
         pages: [
           {
             title: "What a scale tells you",
@@ -290,10 +817,116 @@ const UNITS = [
               </ul>
               <div class="key-idea"><span class="tag">Why it helps</span>
                 If you multiply when you meant to divide, this habit catches it instantly — before any stress can sneak in.
+              </div>`
+          },
+          {
+            title: "Reading a real map",
+            html: `
+              <p>Real maps measure long distances, so the scale usually packs a lot of kilometers into each centimeter.</p>
+              <div class="example"><span class="tag">Worked example</span>
+                <p>Scale: <em>1 cm represents 50 km</em>. Two cities are 6 cm apart on the map.</p>
+                <p>Real distance: <span class="math">6 × 50 = 300 km</span>.</p>
               </div>
-              <p>That's it. Multiply out to the world, divide back to the page. Ready to try? 🗺️</p>`
+              <p>And the reverse: if two towns are really 150 km apart on that same map, they'd be <span class="math">150 ÷ 50 = 3 cm</span> apart on paper.</p>`,
+            checkpoint: {
+              q: "Scale: 1 cm represents 50 km. A road is 8 cm long on the map. How long is the real road?",
+              options: ["400 km", "58 km", "6.25 km"],
+              correct: 0,
+              why: "Map → real life: multiply. 8 cm × 50 km per cm = 400 km."
+            }
+          },
+          {
+            title: "Drawing something to scale",
+            html: `
+              <p>To make your own scale drawing, you <em>choose</em> a scale, then divide every real length by it to get the drawing length.</p>
+              <div class="example"><span class="tag">Worked example</span>
+                <p>You're sketching your room. You choose the scale <em>1 inch represents 2 feet</em>.</p>
+                <p>A wall is 10 feet long → on paper: <span class="math">10 ÷ 2 = 5 inches</span>.</p>
+                <p>A desk is 4 feet long → on paper: <span class="math">4 ÷ 2 = 2 inches</span>.</p>
+              </div>
+              <div class="key-idea"><span class="tag">The move</span>
+                Real life → your drawing always divides by the scale, because the drawing is the small version.
+              </div>`
+          },
+          {
+            title: "Putting it together",
+            html: `
+              <p>Everything about scale drawings comes down to one sentence:</p>
+              <div class="key-idea"><span class="tag">The whole unit, really</span>
+                Multiply out to the world, divide back to the page.
+              </div>
+              <ul>
+                <li>Map/drawing → real life: <strong>multiply</strong> by the scale.</li>
+                <li>Real life → map/drawing: <strong>divide</strong> by the scale.</li>
+                <li>Always sense-check: should the answer be bigger or smaller?</li>
+              </ul>
+              <p>Let's work through map reading and a scale drawing together. 🗺️</p>`
           }
         ],
+        guided: {
+          intro: `Scale drawings come down to one idea: <strong>multiply out to the world, divide back to the page</strong>. Let's practice both directions, then make a drawing.`,
+          problems: [
+            {
+              title: "Map → real life",
+              context: `<p>A map uses the scale <strong>1 cm represents 5 km</strong>. Two towns are <strong>4 cm</strong> apart on the map.</p>`,
+              visual: svgMap("4", "Apex", "Garner"),
+              steps: [
+                {
+                  prompt: `Going from the map to real life — do we multiply or divide by the scale?`,
+                  type: "choice",
+                  choices: ["Multiply (real life is bigger)", "Divide (real life is smaller)"],
+                  answer: 0,
+                  hint: `Real distances are bigger than map distances.`,
+                  teach: `Map → real life means <strong>multiply</strong>, because real life is the big version.`
+                },
+                {
+                  prompt: `So the real distance is 4 × 5 = ?`,
+                  type: "numeric", answer: 20, unit: "km",
+                  teach: `4 cm × 5 km per cm = <strong>20 km</strong>. (Adding to get 9 is the classic trap — scales multiply.)`
+                }
+              ],
+              recap: `<p>4 cm on the map × 5 km/cm = <strong>20 km</strong> in real life.</p>`
+            },
+            {
+              title: "Real life → drawing",
+              context: `<p>A real wall is <strong>12 feet</strong> long. A floor plan uses the scale <strong>1 inch represents 4 feet</strong>.</p>`,
+              steps: [
+                {
+                  prompt: `Going from real life to the drawing — multiply or divide by the scale?`,
+                  type: "choice",
+                  choices: ["Multiply (the drawing is bigger)", "Divide (the drawing is smaller)"],
+                  answer: 1,
+                  hint: `The drawing on paper is the small version.`,
+                  teach: `Real life → drawing means <strong>divide</strong>, because the drawing shrinks reality down.`
+                },
+                {
+                  prompt: `So on the plan the wall is 12 ÷ 4 = ?`,
+                  type: "numeric", answer: 3, unit: "inches",
+                  teach: `12 ÷ 4 = <strong>3 inches</strong>. Sense-check: 3 is smaller than 12, as a drawing should be. ✓`
+                }
+              ],
+              recap: `<p>12 ft ÷ 4 ft per inch = <strong>3 inches</strong> on the plan.</p>`
+            },
+            {
+              title: "Make your own scale drawing",
+              context: `<p>You're drawing your bedroom on paper with the scale <strong>1 inch represents 2 feet</strong>. One wall is <strong>10 feet</strong> long; your desk is <strong>4 feet</strong> wide.</p>`,
+              steps: [
+                {
+                  prompt: `How long should the wall be on your drawing? (10 ÷ 2)`,
+                  type: "numeric", answer: 5, unit: "inches",
+                  hint: `Real → drawing divides by the scale.`,
+                  teach: `10 ÷ 2 = <strong>5 inches</strong> for the wall.`
+                },
+                {
+                  prompt: `How wide should the desk be on your drawing? (4 ÷ 2)`,
+                  type: "numeric", answer: 2, unit: "inches",
+                  teach: `4 ÷ 2 = <strong>2 inches</strong> for the desk. Same scale for every length keeps the drawing true to shape.`
+                }
+              ],
+              recap: `<p>Choose a scale, then divide every real length by it: wall 5 in, desk 2 in.</p>`
+            }
+          ]
+        },
         generate() {
           const v = ri(1, 4);
           const towns = [["Raleigh", "Cary"], ["Apex", "Durham"], ["Wake Forest", "Garner"], ["Holly Springs", "Knightdale"], ["Morrisville", "Zebulon"]];
@@ -370,125 +1003,9 @@ const UNITS = [
             ]
           };
         }
-      },
-      // ================ U4 L3 ================
-      {
-        id: "u4l3",
-        title: "Scaling & Area",
-        blurb: "The sneaky squared rule: scale lengths by 3, and area grows by 9.",
-        pages: [
-          {
-            title: "Area breaks the pattern",
-            html: `
-              <p>Here's a fun surprise. Scale a 2 × 3 rectangle by a factor of 2:</p>
-              <div class="teach-visual">${svgScaledRects(3, 2, 2)}</div>
-              <p>The sides doubled… but count the space inside. The original holds <span class="math">2 × 3 = 6</span> squares. The copy holds <span class="math">4 × 6 = 24</span> squares. The area didn't double — it got <strong>4 times</strong> bigger!</p>
-              <div class="key-idea"><span class="tag">Key idea</span>
-                scale factor <span class="math">s</span> → area is multiplied by <span class="math">s × s = s²</span>
-              </div>`
-          },
-          {
-            title: "Why squared?",
-            html: `
-              <p>Area is two lengths multiplied together — like width × height. When you scale, <em>both</em> of those lengths get multiplied by <span class="math">s</span>:</p>
-              <div class="example"><span class="tag">See it happen</span>
-                <p>new area = (w × s) × (h × s) = (w × h) × <strong>s × s</strong></p>
-                <p>The scale factor sneaks in twice. That's the whole secret.</p>
-              </div>
-              <div class="example"><span class="tag">Worked example</span>
-                <p>A 2 cm × 3 cm rectangle (area 6 cm²) is scaled by 3.</p>
-                <p>New sides: 6 cm × 9 cm. New area: <span class="math">6 × 9 = 54 cm²</span>.</p>
-                <p>Rule check: 6 × 3² = 6 × 9 = 54. ✓</p>
-              </div>`,
-            checkpoint: {
-              q: "Every side of a sticker is scaled by 4 to make a poster. The poster's area is how many times the sticker's?",
-              options: ["4 times", "8 times", "16 times"],
-              correct: 2,
-              why: "Area multiplies by the scale factor squared: 4² = 16. (Doubling to 8 is a really common first instinct — the squared rule takes a little while to feel natural.)"
-            }
-          },
-          {
-            title: "Shrinking squares too",
-            html: `
-              <p>The squared rule works for shrinking just the same:</p>
-              <ul>
-                <li>Scale factor <span class="math">½</span> → area is multiplied by <span class="math">½ × ½ = ¼</span>. Quarter, not half!</li>
-                <li>Scale factor <span class="math">⅓</span> → area becomes <span class="math">⅑</span> of the original.</li>
-              </ul>
-              <div class="key-idea"><span class="tag">Going backwards</span>
-                If the <em>area</em> got multiplied by 9, the scale factor was <span class="math">3</span> — ask "what number times itself gives 9?"
-              </div>
-              <p>Lengths once, areas twice. You've got the whole rule now. 📐</p>`
-          }
-        ],
-        generate() {
-          const v = ri(1, 4);
-          if (v === 1) {
-            const s = pick([2, 3, 4, 5]);
-            const A = ri(3, 9);
-            return {
-              prompt: `A figure has an area of <span class="math">${A} cm²</span>. A scaled copy is made with a scale factor of <span class="math">${s}</span>. What is the area of the copy?`,
-              type: "numeric", answer: A * s * s, unit: "cm²",
-              hints: [
-                `Lengths multiply by ${s}, but area multiplies by ${s}².`,
-                `Area of copy = ${A} × ${s} × ${s}.`
-              ],
-              steps: [
-                `Scale factor ${s} → area multiplies by ${s}² = ${s * s}.`,
-                `${A} × ${s * s} = <strong>${A * s * s} cm²</strong>.`
-              ]
-            };
-          }
-          if (v === 2) {
-            const s = pick([2, 3, 4, 5, 10]);
-            return {
-              prompt: `Every side of a figure is scaled by a factor of <span class="math">${s}</span>. The area of the copy is how many times the area of the original?`,
-              type: "numeric", answer: s * s,
-              hints: [
-                "Area uses two dimensions, so the scale factor gets applied twice.",
-                `Compute ${s} × ${s}.`
-              ],
-              steps: [
-                `Area multiplies by the scale factor squared.`,
-                `${s}² = ${s} × ${s} = <strong>${s * s}</strong> times the original area.`
-              ]
-            };
-          }
-          if (v === 3) {
-            const A = pick([8, 12, 16, 20, 24, 40]);
-            return {
-              prompt: `A poster has an area of <span class="math">${A} in²</span>. A mini version is printed at a scale factor of <span class="math">½</span>. What is the area of the mini poster?`,
-              type: "numeric", answer: A / 4, unit: "in²",
-              hints: [
-                "With a scale factor of ½, area is multiplied by ½ × ½ = ¼.",
-                `Find one quarter of ${A}.`
-              ],
-              steps: [
-                `Scale factor ½ → area multiplies by (½)² = ¼.`,
-                `${A} × ¼ = <strong>${clean(A / 4)} in²</strong>.`
-              ]
-            };
-          }
-          const s = pick([2, 3, 4, 5]);
-          const A = pick([2, 3, 4, 5]);
-          return {
-            prompt: `A small garden plot has an area of <span class="math">${A} m²</span>. A scaled-up plot has an area of <span class="math">${A * s * s} m²</span>. What was the <strong>scale factor</strong> for the side lengths?`,
-            type: "numeric", answer: s,
-            hints: [
-              `First find what the area was multiplied by: ${A * s * s} ÷ ${A} = ${s * s}.`,
-              `Now ask: what number times itself gives ${s * s}?`
-            ],
-            steps: [
-              `Area multiplier = ${A * s * s} ÷ ${A} = ${s * s}.`,
-              `Area multiplies by s², so s² = ${s * s} → s = <strong>${s}</strong>.`,
-              `Check: ${s} × ${s} = ${s * s}. ✓`
-            ]
-          };
-        }
       }
     ]
   },
-
   {
     id: "u8",
     num: "Unit 8",

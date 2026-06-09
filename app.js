@@ -67,6 +67,14 @@ const growthStage = id => { // 0 seed, 1 sprout, 2 bud, 3 bloom
   if (s >= 1 || isLearned(id)) return 1;
   return 0;
 };
+const guidedDone = id => !!(progress.lessons[id] && progress.lessons[id].guidedDone);
+// open a lesson at the right phase: learn → work-it-through → practice
+function defaultTab(id) {
+  if (!isLearned(id)) return "learn";
+  const f = findLesson(id);
+  if (f && f.lesson.guided && !guidedDone(id)) return "guided";
+  return "practice";
+}
 
 // ---------- flower art ----------
 const FLOWER_COLORS = [
@@ -320,7 +328,7 @@ function renderHome() {
     b.addEventListener("click", () => go(() => renderUnit(b.dataset.unit))));
   const cont = view.querySelector("#continueBtn");
   if (cont) cont.addEventListener("click", () => {
-    go(() => renderLesson(progress.lastLesson, isLearned(progress.lastLesson) ? "practice" : "learn"));
+    go(() => renderLesson(progress.lastLesson, defaultTab(progress.lastLesson)));
   });
   view.querySelector("#planCta").addEventListener("click", () => go(renderPlan));
   wireGarden(view);
@@ -366,7 +374,7 @@ function renderUnit(uid) {
   view.querySelectorAll("[data-lesson]").forEach(b =>
     b.addEventListener("click", () => {
       const id = b.dataset.lesson;
-      go(() => renderLesson(id, isLearned(id) ? "practice" : "learn"));
+      go(() => renderLesson(id, defaultTab(id)));
     }));
   window.scrollTo({ top: 0 });
 }
@@ -389,6 +397,7 @@ function renderLesson(lid, tab) {
       <p class="sub">${lesson.blurb}</p>
       <div class="tabs">
         <button class="tab ${tab === "learn" ? "active" : ""}" data-tab="learn">🌱 Learn${isLearned(lid) ? ' <span class="tab-check">✓</span>' : ""}</button>
+        ${lesson.guided ? `<button class="tab ${tab === "guided" ? "active" : ""}" data-tab="guided">🪴 Work it through${guidedDone(lid) ? ' <span class="tab-check">✓</span>' : ""}</button>` : ""}
         <button class="tab ${tab === "practice" ? "active" : ""}" data-tab="practice">🌸 Practice${isBloomed(lid) ? ' <span class="tab-check">✓</span>' : ""}</button>
       </div>
     </header>
@@ -405,10 +414,11 @@ function renderLesson(lid, tab) {
   view.querySelectorAll("[data-nav-lesson]").forEach(b =>
     b.addEventListener("click", () => {
       const id = b.dataset.navLesson;
-      go(() => renderLesson(id, isLearned(id) ? "practice" : "learn"));
+      go(() => renderLesson(id, defaultTab(id)));
     }));
 
   if (tab === "learn") renderLearn(lesson);
+  else if (tab === "guided" && lesson.guided) renderGuided(lesson);
   else renderPractice(lesson);
   window.scrollTo({ top: 0 });
 }
@@ -520,16 +530,179 @@ function renderLearn(lesson) {
             ? "This lesson is now marked ✓ learned in your garden, forever. Whenever you're ready — no rush at all — practice is how it blooms."
             : "Refreshing the roots makes the flower stronger. Practice is waiting whenever you'd like."}</p>
           <div class="q-actions" style="justify-content:center">
-            <button class="btn btn-primary" id="toPractice">Practice this lesson 🌸</button>
+            <button class="btn btn-primary" id="toPractice">${lesson.guided ? "Work it through 🪴" : "Practice this lesson 🌸"}</button>
             <button class="btn btn-ghost" id="toUnit">Back to the unit</button>
           </div>
         </div>
       </div>`;
-    panel.querySelector("#toPractice").addEventListener("click", () => go(() => renderLesson(lesson.id, "practice")));
+    panel.querySelector("#toPractice").addEventListener("click", () => go(() => renderLesson(lesson.id, lesson.guided ? "guided" : "practice")));
     panel.querySelector("#toUnit").addEventListener("click", () => go(() => renderUnit(findLesson(lesson.id).unit.id)));
   }
 
   drawPage();
+}
+
+// ---------- WORK IT THROUGH (guided practice) ----------
+// lesson.guided = { intro?, problems: [ { title, context, visual?,
+//   steps: [ { prompt, type:"choice"|"numeric", choices?, answer, unit?, hint?, teach } ], recap? } ] }
+function gParseNumeric(raw) {
+  let s = raw.trim().replace(/[$,%]/g, "").replace(/\s+/g, "");
+  if (!s) return NaN;
+  if (s.includes("/")) {
+    const [a, b] = s.split("/").map(Number);
+    return (!isNaN(a) && !isNaN(b) && b !== 0) ? a / b : NaN;
+  }
+  return Number(s);
+}
+
+function renderGuided(lesson) {
+  const panel = document.getElementById("panel");
+  const probs = lesson.guided.problems;
+  const st = lessonState(lesson.id);
+  let pIdx = 0, sIdx = 0, picked = -1;
+
+  const step = () => probs[pIdx].steps[sIdx];
+
+  function answerZone(s) {
+    if (s.type === "choice") {
+      return `<div class="choices">${s.choices.map((c, i) =>
+        `<button class="choice" data-gchoice="${i}">${c}</button>`).join("")}</div>`;
+    }
+    return `
+      <div class="answer-row">
+        <input class="answer-input" id="gInput" type="text" inputmode="decimal"
+          placeholder="your answer" autocomplete="off" aria-label="Your answer">
+        ${s.unit ? `<span class="answer-unit">${s.unit}</span>` : ""}
+      </div>`;
+  }
+
+  function draw() {
+    const p = probs[pIdx], s = step();
+    panel.innerHTML = `
+      <div class="guided">
+        ${lesson.guided.intro && pIdx === 0 && sIdx === 0 ? `<div class="gp-intro">${lesson.guided.intro}</div>` : ""}
+        <div class="guided-progress">
+          <span class="gp-kicker">🪴 Work it through — together</span>
+          <span class="gp-count">Example ${pIdx + 1} of ${probs.length} · Step ${sIdx + 1} of ${p.steps.length}</span>
+        </div>
+        <div class="q-card">
+          <div class="gp-context">
+            <h3>${p.title}</h3>
+            ${p.context}
+            ${p.visual ? `<div class="q-visual">${p.visual}</div>` : ""}
+          </div>
+          <p class="q-prompt gp-prompt">${s.prompt}</p>
+          <div class="answer-zone">${answerZone(s)}</div>
+          <div class="q-actions">
+            <button class="btn btn-primary" id="gCheck">Check this step</button>
+            ${s.hint ? `<button class="btn btn-ghost" id="gHint">💡 hint</button>` : ""}
+            <button class="btn btn-ghost" id="gShow">🌿 show me</button>
+          </div>
+          <div id="gHintBox"></div>
+          <div id="gFeed"></div>
+        </div>
+        <div class="sprout-note">${plantIcon("note", 30)}
+          <p>This part is “let's do it together.” One step at a time — nothing here is graded, and the practice garden comes next.</p>
+        </div>
+      </div>`;
+
+    picked = -1;
+    const input = panel.querySelector("#gInput");
+    if (input) { input.focus(); input.addEventListener("keydown", e => { if (e.key === "Enter") checkStep(); }); }
+    panel.querySelectorAll("[data-gchoice]").forEach(b =>
+      b.addEventListener("click", () => {
+        picked = +b.dataset.gchoice;
+        panel.querySelectorAll("[data-gchoice]").forEach(x => x.classList.remove("picked"));
+        b.classList.add("picked");
+      }));
+    panel.querySelector("#gCheck").addEventListener("click", checkStep);
+    const hb = panel.querySelector("#gHint");
+    if (hb) hb.addEventListener("click", () => {
+      panel.querySelector("#gHintBox").innerHTML = `<div class="hint-box"><span class="tag">Hint</span>${step().hint}</div>`;
+      hb.disabled = true;
+    });
+    panel.querySelector("#gShow").addEventListener("click", () => reveal(false));
+  }
+
+  function feed(kind, title, body) {
+    panel.querySelector("#gFeed").innerHTML =
+      `<div class="feedback ${kind}"><p class="fb-title">${title}</p><p>${body}</p></div>`;
+  }
+
+  function checkStep() {
+    const s = step();
+    let correct = false;
+    if (s.type === "choice") {
+      if (picked === -1) { feed("gentle", "Pick an answer first", "No pressure — choose whichever one feels right."); return; }
+      correct = picked === s.answer;
+    } else {
+      const v = gParseNumeric(panel.querySelector("#gInput").value);
+      if (isNaN(v)) { feed("gentle", "I couldn't read that as a number", "Try something like <strong>12</strong>, <strong>3.5</strong>, or <strong>1/2</strong>."); return; }
+      correct = Math.abs(v - s.answer) < 0.011;
+    }
+    if (correct) reveal(true);
+    else {
+      if (s.type === "choice") panel.querySelectorAll("[data-gchoice]").forEach(x => x.classList.remove("picked"));
+      feed("gentle", GENTLE[ri(0, GENTLE.length - 1)],
+        "Take another look, tap <strong>💡 hint</strong>, or <strong>🌿 show me</strong> and we'll walk through it together.");
+    }
+  }
+
+  function reveal(gotIt) {
+    const s = step();
+    const last = sIdx === probs[pIdx].steps.length - 1;
+    const lastProblem = pIdx === probs.length - 1;
+    if (gotIt) smallConfetti();
+    if (s.type === "choice") {
+      panel.querySelectorAll("[data-gchoice]").forEach((x, i) => {
+        x.disabled = true;
+        x.classList.toggle("picked", i === s.answer);
+      });
+    }
+    panel.querySelector("#gCheck").disabled = true;
+    panel.querySelector("#gFeed").innerHTML = `
+      <div class="teach-reveal">
+        <span class="tag">${gotIt ? "🌸 Yes — here's why it works" : "🌿 Here's the idea"}</span>
+        ${s.teach}
+      </div>
+      ${last && probs[pIdx].recap ? `<div class="gp-recap"><span class="tag">So, all together</span>${probs[pIdx].recap}</div>` : ""}
+      <div class="q-actions">
+        <button class="btn btn-primary" id="gNext">${last ? (lastProblem ? "Finish — I'm ready to practice 🌸" : "Next example →") : "Next step →"}</button>
+      </div>`;
+    const nb = panel.querySelector("#gNext");
+    nb.addEventListener("click", advance);
+    nb.focus();
+  }
+
+  function advance() {
+    if (sIdx < probs[pIdx].steps.length - 1) { sIdx++; draw(); window.scrollTo({ top: 0, behavior: "smooth" }); return; }
+    if (pIdx < probs.length - 1) { pIdx++; sIdx = 0; draw(); window.scrollTo({ top: 0, behavior: "smooth" }); return; }
+    finishGuided();
+  }
+
+  function finishGuided() {
+    const first = !st.guidedDone;
+    st.guidedDone = true;
+    saveProgress();
+    if (first) smallConfetti();
+    toast("Worked all the way through 🌿");
+    panel.innerHTML = `
+      <div class="guided rise">
+        <div class="learned-banner">
+          <div style="font-size:2.4rem">🪴</div>
+          <h2>You worked it through — every step!</h2>
+          <p>You just did the whole thing yourself, with support at each step. That's exactly how it should feel. The practice garden is these same ideas — now it's your turn to grow the flower. Unlimited tries, zero rush.</p>
+          <div class="q-actions" style="justify-content:center">
+            <button class="btn btn-primary" id="toPractice2">Practice &amp; bloom it 🌸</button>
+            <button class="btn btn-ghost" id="toLearn2">Re-read the lesson</button>
+          </div>
+        </div>
+      </div>`;
+    panel.querySelector("#toPractice2").addEventListener("click", () => go(() => renderLesson(lesson.id, "practice")));
+    panel.querySelector("#toLearn2").addEventListener("click", () => go(() => renderLesson(lesson.id, "learn")));
+  }
+
+  draw();
 }
 
 // ---------- PRACTICE ENGINE ----------
@@ -788,7 +961,7 @@ function renderPractice(lesson) {
         </div>
       </div>`;
     if (nextUp) panel.querySelector("#nextLesson").addEventListener("click", () =>
-      go(() => renderLesson(nextUp.id, isLearned(nextUp.id) ? "practice" : "learn")));
+      go(() => renderLesson(nextUp.id, defaultTab(nextUp.id))));
     panel.querySelector("#seeGarden").addEventListener("click", () => go(renderHome));
     panel.querySelector("#keepGoing").addEventListener("click", nextQuestion);
   }
@@ -1058,6 +1231,7 @@ applyDusk(localStorage.getItem("mathbloom-dusk") === "1");
 const STEP_META = {
   warmup:   { icon: "☀️", cls: "step-warmup" },
   learn:    { icon: "📖", cls: "step-learn" },
+  work:     { icon: "🪴", cls: "step-work" },
   practice: { icon: "🌸", cls: "step-practice" },
   check:    { icon: "✓",  cls: "step-check" },
 };
@@ -1081,7 +1255,7 @@ function planSessionHTML(s) {
       </li>`;
   }).join("");
   const practiceBtn = s.lessonId
-    ? `<button class="plan-go-btn" data-plan-lesson="${s.lessonId}">${done ? "🌸 Revisit practice" : "Open practice in MathBloom"} →</button>`
+    ? `<button class="plan-go-btn" data-plan-lesson="${s.lessonId}">${done ? "🌸 Revisit this lesson" : "Start this lesson in MathBloom"} →</button>`
     : "";
   return `
     <article class="plan-session ${done ? "is-done" : ""}">
@@ -1169,7 +1343,7 @@ function renderPlan() {
   view.querySelectorAll("[data-plan-lesson]").forEach(b =>
     b.addEventListener("click", () => {
       const id = b.dataset.planLesson;
-      go(() => renderLesson(id, isLearned(id) ? "practice" : "learn"));
+      go(() => renderLesson(id, defaultTab(id)));
     }));
   view.querySelectorAll("[data-plan-unit]").forEach(b =>
     b.addEventListener("click", () => go(() => renderUnit(b.dataset.planUnit))));
@@ -1177,6 +1351,15 @@ function renderPlan() {
 }
 
 // ---------- boot ----------
+// deep-links: #plan, or #lessonId/tab (e.g. #u4l1/guided) — bookmarkable
+function routeFromHash() {
+  const h = location.hash.replace(/^#/, "");
+  if (!h) return false;
+  if (h === "plan") { renderPlan(); return true; }
+  const [lid, tab] = h.split("/");
+  if (findLesson(lid)) { renderLesson(lid, tab || defaultTab(lid)); return true; }
+  return false;
+}
 document.getElementById("planBtn").addEventListener("click", () => { location.hash = "plan"; go(renderPlan); });
 document.getElementById("logoLink").addEventListener("click", e => { e.preventDefault(); if (location.hash) location.hash = ""; go(renderHome); });
-if (location.hash === "#plan") renderPlan(); else renderHome();
+if (!routeFromHash()) renderHome();

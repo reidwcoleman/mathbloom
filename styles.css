@@ -783,6 +783,7 @@ body.dusk .toast { background: var(--sage-soft); color: var(--ink); }
 }
 .step-warmup .step-icon { background: var(--butter-soft); border-color: var(--butter); }
 .step-learn .step-icon { background: var(--lav-soft); border-color: var(--lav); }
+.step-work .step-icon { background: var(--rose-soft); border-color: var(--rose); }
 .step-practice .step-icon { background: var(--peach-soft); border-color: var(--peach); }
 .step-check .step-icon { background: var(--sage-soft); border-color: var(--sage); color: var(--deep); }
 .step-text { flex: 1 1 auto; }
@@ -843,3 +844,38 @@ body.dusk .toast { background: var(--sage-soft); color: var(--ink); }
   .pw-head { flex-wrap: wrap; }
   .plan-session { padding: 16px 15px; }
 }
+
+/* ============================================================
+   WORK IT THROUGH — guided practice
+   ============================================================ */
+.gp-intro {
+  background: var(--lav-soft); border: 1.5px solid var(--lav); border-radius: var(--radius-sm);
+  padding: 16px 20px; margin-bottom: 16px; color: var(--ink); line-height: 1.6;
+}
+.guided-progress {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;
+  margin-bottom: 12px;
+}
+.gp-kicker { font-size: .82rem; font-weight: 800; color: var(--deep); letter-spacing: .02em; }
+.gp-count { font-size: .76rem; font-weight: 700; color: var(--ink-soft); }
+.gp-context {
+  background: var(--cream-2); border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 16px;
+}
+.gp-context h3 { font-family: var(--font-display); font-weight: 640; font-size: 1.08rem; color: var(--ink); margin-bottom: 6px; }
+.gp-context p { color: var(--ink-soft); font-size: .94rem; line-height: 1.55; }
+.gp-context .q-visual { margin-top: 10px; }
+.gp-prompt { font-weight: 800; }
+.teach-reveal {
+  background: var(--sage-soft); border-radius: var(--radius-sm); padding: 14px 18px; margin: 14px 0 4px;
+  line-height: 1.6; color: var(--ink);
+}
+.teach-reveal .tag, .gp-recap .tag {
+  display: block; font-size: .72rem; font-weight: 800; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--deep); margin-bottom: 6px;
+}
+.teach-reveal p { margin-bottom: 6px; }
+.gp-recap {
+  background: var(--butter-soft); border: 1.5px solid var(--butter); border-radius: var(--radius-sm);
+  padding: 14px 18px; margin: 12px 0 4px; line-height: 1.6; color: var(--ink);
+}
+.gp-recap .tag { color: var(--amber); }
