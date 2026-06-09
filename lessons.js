@@ -2078,3 +2078,400 @@ const UNITS = [
     ]
   }
 ];
+
+/* ============================================================
+   WEEKLY ASSIGNMENTS — one per week, mixed practice
+   Built on the Wake County Math 6 Plus workbook (IM / Open Up
+   Resources Grade 7, Unit 1 = WCPSS Unit 4). Each assignment
+   shuffles together every skill from that week's lessons so a
+   student practices choosing the right move, not just repeating
+   one. Same engine as a lesson: a generate() that the practice
+   view randomizes, with free hints and full worked steps. They
+   bloom at GOAL petals just like a lesson, but live in the
+   Summer Plan rather than the garden.
+   ============================================================ */
+const ASSIGNMENTS = [
+  // ---- Week 1 assignment: mixes U4 L1 (scale factors) + U4 L2 (area) ----
+  {
+    id: "w1a",
+    week: 1,
+    title: "Week 1 Assignment — Scaling Shapes",
+    blurb: "A mixed practice set for the whole week: finding scale factors, missing sides, angles, and the area-squared rule — all jumbled together, just like the workbook.",
+    skills: [
+      "Find a scale factor (copy ÷ original)",
+      "Use a scale factor to find a missing side",
+      "Run it backwards (copy → original)",
+      "Angles never change when you scale",
+      "Tell a true scaled copy from a stretch",
+      "Area scales by the factor squared (s²)",
+    ],
+    sourceLessons: [
+      { id: "u4l1", title: "Scaled Copies & Scale Factors" },
+      { id: "u4l2", title: "Scaling & Area" },
+    ],
+    generate() {
+      const v = ri(1, 9);
+      // 1 — find the scale factor from two figures
+      if (v === 1) {
+        const w = ri(2, 5), h = ri(2, 4);
+        const f = pick([2, 3, 0.5, 1.5]);
+        return {
+          prompt: `Rectangle <strong>B</strong> is a scaled copy of Rectangle <strong>A</strong>. What is the <strong>scale factor</strong> from A to B?`,
+          visual: svgScaledRects(w, h, f),
+          type: "numeric", answer: f,
+          hints: [
+            "Pick one pair of corresponding sides and compare them.",
+            `Scale factor = copy ÷ original. Try ${clean(w * f)} ÷ ${clean(w)}.`
+          ],
+          steps: [
+            `Corresponding widths: A is ${clean(w)} cm and B is ${clean(w * f)} cm.`,
+            `Scale factor = ${clean(w * f)} ÷ ${clean(w)} = <strong>${clean(f)}</strong>.`,
+            `Heights agree too: ${clean(h * f)} ÷ ${clean(h)} = ${clean(f)}. ✓`
+          ]
+        };
+      }
+      // 2 — use the scale factor to find a missing side
+      if (v === 2) {
+        const f = pick([2, 3, 4, 0.5, 1.5]);
+        const s = f === 0.5 ? pick([4, 6, 8, 10, 12]) : ri(3, 9);
+        const ctx = pick(["logo", "poster design", "comic panel", "sticker"]);
+        return {
+          prompt: `A ${ctx} is scaled by a factor of <span class="math">${fshow(f)}</span>. One side of the original is <span class="math">${s} cm</span> long. How long is the matching side in the copy?`,
+          type: "numeric", answer: s * f, unit: "cm",
+          hints: [
+            "The scale factor is what you multiply every original length by.",
+            `Multiply: ${s} × ${fshow(f)}.`
+          ],
+          steps: [
+            `Copy length = original × scale factor.`,
+            `${s} × ${fshow(f)} = <strong>${clean(s * f)} cm</strong>.`
+          ]
+        };
+      }
+      // 3 — run it backwards (copy → original)
+      if (v === 3) {
+        const f = pick([2, 3, 4]);
+        const orig = ri(3, 8);
+        const copySide = orig * f;
+        return {
+          prompt: `A scaled copy was made with a scale factor of <span class="math">${f}</span>. A side of the <em>copy</em> is <span class="math">${copySide} cm</span>. How long is the matching side of the <em>original</em>?`,
+          type: "numeric", answer: orig, unit: "cm",
+          hints: [
+            "The copy is bigger, so the original must come out smaller.",
+            `Divide the copy's side by the scale factor: ${copySide} ÷ ${f}.`
+          ],
+          steps: [
+            `Copy = original × ${f}, so original = copy ÷ ${f}.`,
+            `${copySide} ÷ ${f} = <strong>${orig} cm</strong>.`,
+            `Check: ${orig} × ${f} = ${copySide}. ✓`
+          ]
+        };
+      }
+      // 4 — angles never change
+      if (v === 4) {
+        const a = pick([25, 30, 35, 40, 50, 55, 65, 70, 80, 110]);
+        const f = pick([2, 3, 0.5, 1.5]);
+        return {
+          prompt: `Triangle B is a scaled copy of Triangle A with scale factor <span class="math">${fshow(f)}</span>. One angle in A measures <span class="math">${a}°</span>. What is the matching angle in B?`,
+          type: "numeric", answer: a, unit: "°",
+          hints: [
+            "Scaling stretches lengths — does it touch angles?",
+            "Corresponding angles in a scaled copy are exactly equal."
+          ],
+          steps: [
+            `A scale factor changes lengths but leaves every angle unchanged.`,
+            `So the matching angle is still <strong>${a}°</strong>.`
+          ]
+        };
+      }
+      // 5 — compare the size of the factor (choice)
+      if (v === 5) {
+        const f = pick([0.5, 0.75, 1.5, 2, 3, 1]);
+        const correct = f < 1 ? 1 : (f === 1 ? 2 : 0);
+        return {
+          prompt: `A copy is made with a scale factor of <span class="math">${fshow(f)}</span>. How does the copy compare to the original?`,
+          type: "choice",
+          choices: ["Larger than the original", "Smaller than the original", "Exactly the same size"],
+          correctIndex: correct,
+          hints: [
+            "Compare the scale factor to 1.",
+            "Bigger than 1 → grows. Between 0 and 1 → shrinks. Exactly 1 → same."
+          ],
+          steps: [
+            `The factor ${fshow(f)} is ${f < 1 ? "between 0 and 1, so the copy is <strong>smaller</strong>" : f === 1 ? "exactly 1, so the copy is the <strong>same size</strong>" : "greater than 1, so the copy is <strong>larger</strong>"}.`
+          ]
+        };
+      }
+      // 6 — true scaled copy, or a stretch? (choice)
+      if (v === 6) {
+        const real = Math.random() < 0.5;
+        const w = ri(2, 4), h = ri(3, 6);
+        const f = pick([2, 3]);
+        const w2 = w * f;
+        const h2 = real ? h * f : h * f + pick([1, 2, -1]);
+        const fw = w2 / w, fh = h2 / h;
+        return {
+          prompt: `A ${w} cm × ${h} cm rectangle becomes a ${clean(w2)} cm × ${clean(h2)} cm rectangle. Is the new one a <strong>true scaled copy</strong>?`,
+          type: "choice",
+          choices: ["Yes — a true scaled copy", "No — it was stretched"],
+          correctIndex: real ? 0 : 1,
+          hints: [
+            "Find the scale factor from each pair of matching sides.",
+            "A true scaled copy gives the SAME factor for every pair of sides."
+          ],
+          steps: [
+            `Short sides: ${clean(w2)} ÷ ${w} = ${clean(fw)}.`,
+            `Long sides: ${clean(h2)} ÷ ${h} = ${clean(fh)}.`,
+            real
+              ? `Both give ${clean(fw)} — the same factor, so it <strong>is</strong> a scaled copy. ✓`
+              : `${clean(fw)} and ${clean(fh)} are different, so it was <strong>stretched</strong>, not scaled.`
+          ]
+        };
+      }
+      // 7 — area scales by s² (forward)
+      if (v === 7) {
+        const s = pick([2, 3, 4, 5]);
+        const A = ri(3, 9);
+        return {
+          prompt: `A figure has an area of <span class="math">${A} cm²</span>. It is scaled by a factor of <span class="math">${s}</span>. What is the area of the copy?`,
+          type: "numeric", answer: A * s * s, unit: "cm²",
+          hints: [
+            `Lengths × ${s}, but area × ${s}².`,
+            `Area of copy = ${A} × ${s} × ${s}.`
+          ],
+          steps: [
+            `Scale factor ${s} → area multiplies by ${s}² = ${s * s}.`,
+            `${A} × ${s * s} = <strong>${A * s * s} cm²</strong>.`
+          ]
+        };
+      }
+      // 8 — un-square: area multiplier → length factor
+      if (v === 8) {
+        const s = pick([2, 3, 4, 5]);
+        const A = pick([2, 3, 4, 5]);
+        return {
+          prompt: `A garden plot has an area of <span class="math">${A} m²</span>. A scaled-up plot has an area of <span class="math">${A * s * s} m²</span>. What was the <strong>scale factor</strong> for the side lengths?`,
+          type: "numeric", answer: s,
+          hints: [
+            `First find the area multiplier: ${A * s * s} ÷ ${A} = ${s * s}.`,
+            `Area grows by s², so ask: what number times itself is ${s * s}?`
+          ],
+          steps: [
+            `Area multiplier = ${A * s * s} ÷ ${A} = ${s * s}.`,
+            `s² = ${s * s}, so s = <strong>${s}</strong> (because ${s} × ${s} = ${s * s}). ✓`
+          ]
+        };
+      }
+      // 9 — compute the area of a scaled rectangle
+      const s = pick([2, 3]);
+      const w = ri(2, 5), h = ri(2, 4);
+      return {
+        prompt: `A ${w} cm × ${h} cm rectangle is scaled by a factor of <span class="math">${s}</span>. What is the <strong>area of the scaled copy</strong>?`,
+        type: "numeric", answer: (w * s) * (h * s), unit: "cm²",
+        hints: [
+          `New sides: ${w} × ${s} = ${w * s} cm and ${h} × ${s} = ${h * s} cm.`,
+          `Area of the copy = ${w * s} × ${h * s}.`
+        ],
+        steps: [
+          `New side lengths: ${w * s} cm and ${h * s} cm.`,
+          `Area = ${w * s} × ${h * s} = <strong>${(w * s) * (h * s)} cm²</strong>.`,
+          `Or use the rule: ${w * h} × ${s}² = ${w * h} × ${s * s} = ${(w * s) * (h * s)}. ✓`
+        ]
+      };
+    }
+  },
+
+  // ---- Week 2 assignment: mixes U4 L3 (maps/plans) + U4 L4 (drawings, unit-less scales) ----
+  {
+    id: "w2a",
+    week: 2,
+    title: "Week 2 Assignment — Scale Drawings & Maps",
+    blurb: "A mixed practice set for the whole week: map distances both directions, floor plans, unit-less scales like 1 : 1000, and inventing your own scale — shuffled together, workbook-style.",
+    skills: [
+      "Map → real life (multiply by the scale)",
+      "Real life → map (divide by the scale)",
+      "Floor plans: inches ↔ feet",
+      "Find a scale from a known pair of lengths",
+      "Unit-less scales like 1 : 1000 (with cm ↔ m)",
+      "Choose a scale that fits the page",
+    ],
+    sourceLessons: [
+      { id: "u4l3", title: "Scale Drawings & Maps" },
+      { id: "u4l4", title: "Creating Scale Drawings & Scales Without Units" },
+    ],
+    generate() {
+      const towns = [["Raleigh", "Cary"], ["Apex", "Durham"], ["Wake Forest", "Garner"], ["Holly Springs", "Knightdale"], ["Morrisville", "Zebulon"]];
+      const v = ri(1, 9);
+      // 1 — map cm → real km (multiply)
+      if (v === 1) {
+        const k = pick([2, 5, 10, 25, 50]);
+        const d = pick([2, 3, 4, 5, 6, 2.5, 3.5]);
+        const [a, b] = pick(towns);
+        return {
+          prompt: `A map uses the scale <strong>1 cm represents ${k} km</strong>. On the map, ${a} and ${b} are <span class="math">${clean(d)} cm</span> apart. What is the real distance?`,
+          visual: svgMap(clean(d), a, b),
+          type: "numeric", answer: d * k, unit: "km",
+          hints: [
+            `Every 1 cm on the map stands for ${k} real km.`,
+            `Map → real means multiply: ${clean(d)} × ${k}.`
+          ],
+          steps: [
+            `Map → real life multiplies by the scale.`,
+            `${clean(d)} × ${k} = <strong>${clean(d * k)} km</strong>.`,
+            `Sense-check: real life is the bigger number. ${clean(d * k)} > ${clean(d)}. ✓`
+          ]
+        };
+      }
+      // 2 — real km → map cm (divide)
+      if (v === 2) {
+        const k = pick([2, 4, 5, 10, 25]);
+        const d = pick([2, 3, 4, 5, 6]);
+        const real = d * k;
+        const [a, b] = pick(towns);
+        return {
+          prompt: `${a} and ${b} are really <span class="math">${real} km</span> apart. A map uses the scale <strong>1 cm represents ${k} km</strong>. How far apart are they <em>on the map</em>?`,
+          type: "numeric", answer: d, unit: "cm",
+          hints: [
+            "Real → map, so the answer should be a smaller number.",
+            `Divide the real distance by the scale: ${real} ÷ ${k}.`
+          ],
+          steps: [
+            `Real life → map divides by the scale.`,
+            `${real} ÷ ${k} = <strong>${d} cm</strong>.`,
+            `Sense-check: the map number is smaller. ${d} < ${real}. ✓`
+          ]
+        };
+      }
+      // 3 — floor plan inches → real feet
+      if (v === 3) {
+        const k = pick([2, 4, 8]);
+        const d = pick([2, 3, 4, 5, 2.5]);
+        const rooms = ["bedroom wall", "kitchen counter", "garage door", "classroom whiteboard", "bookshelf"];
+        return {
+          prompt: `A floor plan uses the scale <strong>1 inch represents ${k} feet</strong>. A ${pick(rooms)} is <span class="math">${clean(d)} inches</span> long on the plan. How long is it in real life?`,
+          type: "numeric", answer: d * k, unit: "feet",
+          hints: [
+            `Each inch on the plan is worth ${k} real feet.`,
+            `Multiply: ${clean(d)} × ${k}.`
+          ],
+          steps: [
+            `Plan → real life multiplies by the scale.`,
+            `${clean(d)} × ${k} = <strong>${clean(d * k)} feet</strong>.`
+          ]
+        };
+      }
+      // 4 — real feet → plan inches
+      if (v === 4) {
+        const k = pick([2, 3, 4]);
+        const n = ri(2, 6);
+        const realFt = k * n;
+        const things = ["sofa", "kitchen table", "bookshelf", "garage door", "bedroom wall"];
+        return {
+          prompt: `You're drawing a floor plan with the scale <strong>1 inch represents ${k} feet</strong>. A ${pick(things)} is <span class="math">${realFt} feet</span> long. How long should you draw it?`,
+          type: "numeric", answer: n, unit: "inches",
+          hints: [
+            "Real → drawing divides by the scale (the drawing is smaller).",
+            `Divide ${realFt} ÷ ${k}.`
+          ],
+          steps: [
+            `Real → drawing divides by the scale.`,
+            `${realFt} ÷ ${k} = <strong>${n} inches</strong>.`,
+            `Sense-check: the drawing is smaller. ${n} < ${realFt}. ✓`
+          ]
+        };
+      }
+      // 5 — find the scale from a known pair
+      if (v === 5) {
+        const d = pick([2, 3, 4, 5]);
+        const k = pick([5, 10, 20, 25]);
+        const real = d * k;
+        const [a, b] = pick(towns);
+        return {
+          prompt: `On a map, ${a} and ${b} are <span class="math">${d} cm</span> apart. In real life they are <span class="math">${real} km</span> apart. What is the map's scale — <strong>1 cm represents how many km</strong>?`,
+          type: "numeric", answer: k, unit: "km",
+          hints: [
+            `The scale is how many real km fit in each map cm.`,
+            `Divide real by map: ${real} ÷ ${d}.`
+          ],
+          steps: [
+            `Scale = real ÷ map = ${real} ÷ ${d} = <strong>${k}</strong>.`,
+            `So 1 cm represents ${k} km. Check: ${d} × ${k} = ${real}. ✓`
+          ]
+        };
+      }
+      // 6 — unit-less scale 1 : N, drawing → real (same units)
+      if (v === 6) {
+        const N = pick([100, 200, 500, 1000]);
+        const L = pick([2, 3, 4, 5, 6]);
+        return {
+          prompt: `A map uses the scale <strong>1 to ${N}</strong> (no units). A trail is <span class="math">${L} cm</span> long on the map. How long is the real trail, in <strong>centimeters</strong>?`,
+          type: "numeric", answer: L * N, unit: "cm",
+          hints: [
+            `“1 to ${N}” means every 1 cm on the map is ${N} cm in real life.`,
+            `Multiply: ${L} × ${N}.`
+          ],
+          steps: [
+            `A unit-less scale multiplies the drawing length by ${N}.`,
+            `${L} × ${N} = <strong>${L * N} cm</strong>.`
+          ]
+        };
+      }
+      // 7 — unit-less scale + cm → m conversion
+      if (v === 7) {
+        const N = pick([200, 500, 1000]);
+        const L = pick([2, 4, 5, 6]);
+        const realCm = L * N;
+        const realM = realCm / 100;
+        return {
+          prompt: `On a <strong>1 to ${N}</strong> map, a road measures <span class="math">${L} cm</span>. How long is the real road in <strong>meters</strong>? (100 cm = 1 m)`,
+          type: "numeric", answer: realM, unit: "m",
+          hints: [
+            `First find the real length in cm: ${L} × ${N}.`,
+            `Then divide by 100 to get meters: ${realCm} ÷ 100.`
+          ],
+          steps: [
+            `Drawing → real: ${L} × ${N} = ${realCm} cm.`,
+            `Convert to meters: ${realCm} ÷ 100 = <strong>${clean(realM)} m</strong>.`
+          ]
+        };
+      }
+      // 8 — invent a scale that fits the page
+      if (v === 8) {
+        const mpc = pick([2, 3, 4, 5]);
+        const draw = pick([10, 20, 30]);
+        const realM = draw * mpc;
+        return {
+          prompt: `A real garden is <span class="math">${realM} m</span> long. You want your scale drawing to be <span class="math">${draw} cm</span> long. On your drawing, <strong>1 cm should represent how many meters</strong>?`,
+          type: "numeric", answer: mpc, unit: "m",
+          hints: [
+            "You're inventing the scale: real length ÷ drawing length.",
+            `Divide ${realM} ÷ ${draw}.`
+          ],
+          steps: [
+            `Scale = real ÷ drawing = ${realM} ÷ ${draw} = <strong>${mpc}</strong>.`,
+            `So 1 cm represents ${mpc} m. Check: ${draw} × ${mpc} = ${realM}. ✓`
+          ]
+        };
+      }
+      // 9 — sense-check the direction (choice)
+      const toReal = Math.random() < 0.5;
+      return {
+        prompt: toReal
+          ? `You're going <strong>from a map to real life</strong>. Compared with the map distance, your answer should be…`
+          : `You're going <strong>from real life onto a map</strong>. Compared with the real distance, your answer should be…`,
+        type: "choice",
+        choices: ["Bigger (multiply by the scale)", "Smaller (divide by the scale)", "Exactly the same"],
+        correctIndex: toReal ? 0 : 1,
+        hints: [
+          "A map is a shrunk-down picture of the real world.",
+          toReal ? "Real life is always bigger than the map." : "The map is always smaller than real life."
+        ],
+        steps: [
+          toReal
+            ? `Map → real life makes things <strong>bigger</strong>, so you <strong>multiply</strong> by the scale.`
+            : `Real life → map makes things <strong>smaller</strong>, so you <strong>divide</strong> by the scale.`
+        ]
+      };
+    }
+  }
+];

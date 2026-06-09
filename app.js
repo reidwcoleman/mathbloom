@@ -221,6 +221,12 @@ function findLesson(lid) {
   for (const u of UNITS) for (const l of u.lessons) if (l.id === lid) return { unit: u, lesson: l };
   return null;
 }
+function findAssignment(aid) {
+  return (typeof ASSIGNMENTS !== "undefined" && ASSIGNMENTS.find(a => a.id === aid)) || null;
+}
+function assignmentForWeek(n) {
+  return (typeof ASSIGNMENTS !== "undefined" && ASSIGNMENTS.find(a => a.week === n)) || null;
+}
 function unitProgress(u) {
   const total = u.lessons.length * GOAL;
   const got = u.lessons.reduce((a, l) => a + lessonStars(l.id), 0);
@@ -438,6 +444,55 @@ function lessonNavHTML(lid) {
       <span class="ln-title">${next ? next.title : ""}</span>
     </button>
   </div>`;
+}
+
+// ---------- WEEKLY ASSIGNMENT (mixed practice, plan-linked) ----------
+function renderAssignment(aid) {
+  const a = findAssignment(aid);
+  if (!a) return renderHome();
+  const bloomed = isBloomed(a.id);
+
+  view.innerHTML = `
+    <nav class="crumbs rise">
+      <a href="#" data-home>← My garden</a> <span>/</span>
+      <a href="#" data-plan>Summer plan</a> <span>/ ${a.title}</span>
+    </nav>
+    <header class="lesson-head assign-head rise d1">
+      <span class="hero-kicker">📝 Week ${a.week} assignment${bloomed ? " · ✓ grown" : ""}</span>
+      <h1>${a.title}</h1>
+      <p class="sub">${a.blurb}</p>
+      <div class="assign-skills">
+        <span class="assign-skills-tag">What's mixed in</span>
+        <ul>${a.skills.map(s => `<li>${s}</li>`).join("")}</ul>
+      </div>
+      <p class="assign-source">Pulls from this week's lessons:
+        ${a.sourceLessons.map(l => `<a href="#" data-src-lesson="${l.id}">${l.title}</a>`).join(" · ")}
+      </p>
+    </header>
+    <div id="panel"></div>
+    <div class="lesson-nav-row">
+      <button class="lesson-nav-btn" data-plan>
+        <span class="ln-kicker">← Back to</span>
+        <span class="ln-title">Summer plan</span>
+      </button>
+      <button class="lesson-nav-btn next" data-src-lesson="${a.sourceLessons[a.sourceLessons.length - 1].id}">
+        <span class="ln-kicker">Need a refresher? →</span>
+        <span class="ln-title">${a.sourceLessons[a.sourceLessons.length - 1].title}</span>
+      </button>
+    </div>`;
+
+  view.querySelector("[data-home]").addEventListener("click", e => { e.preventDefault(); go(renderHome); });
+  view.querySelectorAll("[data-plan]").forEach(b =>
+    b.addEventListener("click", e => { e.preventDefault(); location.hash = "plan"; go(renderPlan); }));
+  view.querySelectorAll("[data-src-lesson]").forEach(b =>
+    b.addEventListener("click", e => {
+      e.preventDefault();
+      const id = b.dataset.srcLesson;
+      go(() => renderLesson(id, defaultTab(id)));
+    }));
+
+  renderPractice(a);
+  window.scrollTo({ top: 0 });
 }
 
 // ---------- LEARN (paged walk-through) ----------
@@ -1274,9 +1329,35 @@ function planSessionHTML(s) {
     </article>`;
 }
 
+function planAssignmentHTML(a, sessionsDone, total) {
+  if (!a) return "";
+  const done = isBloomed(a.id);
+  const ready = sessionsDone >= total && total > 0;
+  const petals = lessonStars(a.id);
+  return `
+    <article class="plan-assignment ${done ? "is-done" : ""}">
+      <header class="pa-head">
+        <span class="pa-badge" aria-hidden="true">📝</span>
+        <div class="pa-titles">
+          <span class="pa-kicker">Weekly assignment${done ? " · ✓ grown" : ""}</span>
+          <h4>${a.title.replace(/^Week \d+ Assignment — /, "")}</h4>
+        </div>
+        <span class="pa-petals">${petals}/${GOAL} 🌸</span>
+      </header>
+      <p class="pa-desc">${a.blurb}</p>
+      <p class="pa-note">${ready
+        ? "Both lessons are bloomed — you're ready. Mixed practice is the best test of all. 💛"
+        : "Best after you've bloomed both lessons above, but you can warm up anytime — hints and steps are always free."}</p>
+      <div class="ps-actions">
+        <button class="plan-go-btn pa-go" data-plan-assignment="${a.id}">${done ? "🌸 Revisit the assignment" : "Start the weekly assignment"} →</button>
+      </div>
+    </article>`;
+}
+
 function planWeekHTML(w, i) {
   const total = w.sessions.length;
   const done = w.sessions.filter(sessionDone).length;
+  const assignment = assignmentForWeek(w.n);
   return `
     <section class="plan-week rise d${i + 2}">
       <header class="pw-head">
@@ -1290,6 +1371,7 @@ function planWeekHTML(w, i) {
       <div class="pw-cando"><span class="cando-tag">🎯 Can-do goal</span> ${w.canDo}</div>
       <div class="pw-sessions">
         ${w.sessions.map(planSessionHTML).join("")}
+        ${planAssignmentHTML(assignment, done, total)}
       </div>
     </section>`;
 }
@@ -1345,6 +1427,12 @@ function renderPlan() {
       const id = b.dataset.planLesson;
       go(() => renderLesson(id, defaultTab(id)));
     }));
+  view.querySelectorAll("[data-plan-assignment]").forEach(b =>
+    b.addEventListener("click", () => {
+      const id = b.dataset.planAssignment;
+      location.hash = id;
+      go(() => renderAssignment(id));
+    }));
   view.querySelectorAll("[data-plan-unit]").forEach(b =>
     b.addEventListener("click", () => go(() => renderUnit(b.dataset.planUnit))));
   window.scrollTo({ top: 0 });
@@ -1357,6 +1445,7 @@ function routeFromHash() {
   if (!h) return false;
   if (h === "plan") { renderPlan(); return true; }
   const [lid, tab] = h.split("/");
+  if (findAssignment(lid)) { renderAssignment(lid); return true; }
   if (findLesson(lid)) { renderLesson(lid, tab || defaultTab(lid)); return true; }
   return false;
 }

@@ -19,6 +19,17 @@ questions (numeric entry and multiple choice, with SVG diagrams, maps, tables, g
 and percent bars). Finishing the Learn pages marks the lesson **✓ learned**; five correct
 practice answers makes it **bloom** — both saved permanently.
 
+## Weekly assignments
+
+After each week of the **Summer Math Plan**, a mixed-practice **assignment** appears at the
+bottom of the week — one per week, built on the Wake County Math 6 Plus workbook (IM / Open Up
+Resources Grade 7). Unlike a single-lesson practice tab, an assignment *shuffles together every
+skill from that week's lessons* so the student practices choosing the right move, not just
+repeating one. Same calm engine: randomized questions, free hints and full worked steps, and it
+"blooms" at five petals. Week 1 mixes scale factors, missing sides, angles, the scaled-copy
+test, and the area-squared rule; Week 2 mixes map distances (both directions), floor plans,
+unit-less scales like 1 : 1000, and inventing your own scale. Deep-linkable at `#w1a` / `#w2a`.
+
 ## The garden
 
 The home page is an illustrated meadow scene. Each lesson is a plant that grows through

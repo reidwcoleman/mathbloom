@@ -807,6 +807,42 @@ body.dusk .toast { background: var(--sage-soft); color: var(--ink); }
 }
 .plan-go-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -12px rgba(62,107,79,.7); }
 
+/* weekly assignment card (in the plan, after the sessions) */
+.plan-assignment {
+  background: linear-gradient(125deg, var(--lav-soft), var(--card));
+  border: 1.5px dashed var(--lav); border-radius: var(--radius-sm);
+  padding: 18px 20px; margin-top: 4px;
+}
+.plan-assignment.is-done { background: linear-gradient(120deg, var(--card), var(--sage-soft)); border-style: solid; border-color: var(--sage); }
+.pa-head { display: flex; align-items: center; gap: 12px; }
+.pa-badge {
+  font-size: 1.05rem; background: var(--card); border: 1.5px solid var(--lav);
+  border-radius: 10px; width: 38px; height: 38px; display: grid; place-items: center; flex: 0 0 auto;
+}
+.plan-assignment.is-done .pa-badge { border-color: var(--sage); }
+.pa-titles { flex: 1 1 auto; }
+.pa-kicker { font-size: .74rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--deep); }
+.pa-titles h4 { font-family: var(--font-display); font-weight: 640; font-size: 1.12rem; color: var(--ink); margin-top: 1px; }
+.pa-petals { font-size: .82rem; font-weight: 800; color: var(--deep); flex: 0 0 auto; white-space: nowrap; }
+.pa-desc { color: var(--ink-soft); font-size: .92rem; line-height: 1.55; margin: 12px 0 8px; }
+.pa-note { color: var(--ink-soft); font-size: .86rem; font-style: italic; line-height: 1.5; margin-bottom: 4px; }
+
+/* assignment view header (the "what's mixed in" intro) */
+.assign-skills {
+  background: var(--lav-soft); border: 1.5px solid var(--lav);
+  border-radius: var(--radius-sm); padding: 13px 16px; margin: 14px 0 12px;
+}
+.assign-skills-tag {
+  display: block; font-size: .72rem; font-weight: 800; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--deep); margin-bottom: 7px;
+}
+.assign-skills ul { margin: 0; padding-left: 20px; columns: 2; column-gap: 22px; }
+.assign-skills li { font-size: .9rem; color: var(--ink); line-height: 1.5; margin-bottom: 3px; break-inside: avoid; }
+.assign-source { font-size: .88rem; color: var(--ink-soft); }
+.assign-source a { color: var(--deep); font-weight: 700; text-decoration: none; border-bottom: 1.5px solid var(--sage); }
+.assign-source a:hover { background: var(--sage-soft); }
+@media (max-width: 560px) { .assign-skills ul { columns: 1; } }
+
 /* rest of summer */
 .plan-rest { margin: 26px 0 10px; }
 .plan-rest h3, .plan-resources h3 { font-family: var(--font-display); font-weight: 640; font-size: 1.3rem; color: var(--ink); }
