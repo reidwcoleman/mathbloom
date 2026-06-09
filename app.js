@@ -263,6 +263,16 @@ function renderHome() {
       </button>` : ""}
     </section>
 
+    <button class="plan-cta rise d1b" id="planCta">
+      <span class="plan-cta-emoji">🗓️</span>
+      <span class="plan-cta-text">
+        <span class="plan-cta-kicker">Your summer roadmap</span>
+        <h3>Summer Math Plan — Weeks 1 &amp; 2 are ready</h3>
+        <p>Six sessions through Unit 4, each with the lesson, hands-on work, and a garden to bloom.</p>
+      </span>
+      <span class="plan-cta-go">→</span>
+    </button>
+
     <section class="garden rise d2">
       <div class="garden-head">
         <h2>Your garden</h2>
@@ -312,6 +322,7 @@ function renderHome() {
   if (cont) cont.addEventListener("click", () => {
     go(() => renderLesson(progress.lastLesson, isLearned(progress.lastLesson) ? "practice" : "learn"));
   });
+  view.querySelector("#planCta").addEventListener("click", () => go(renderPlan));
   wireGarden(view);
   window.scrollTo({ top: 0 });
 }
@@ -1043,6 +1054,129 @@ function applyDusk(on) {
 duskBtn.addEventListener("click", () => applyDusk(!document.body.classList.contains("dusk")));
 applyDusk(localStorage.getItem("mathbloom-dusk") === "1");
 
+// ---------- SUMMER PLAN ----------
+const STEP_META = {
+  warmup:   { icon: "☀️", cls: "step-warmup" },
+  learn:    { icon: "📖", cls: "step-learn" },
+  practice: { icon: "🌸", cls: "step-practice" },
+  check:    { icon: "✓",  cls: "step-check" },
+};
+
+// a session counts as "grown" once its MathBloom practice has bloomed
+const sessionDone = s => !!(s.lessonId && isBloomed(s.lessonId));
+
+function planSessionHTML(s) {
+  const done = sessionDone(s);
+  const imChips = s.im.map(l =>
+    `<a class="im-chip" href="${l.url}" target="_blank" rel="noopener">${l.code} · ${l.title} ↗</a>`).join("");
+  const steps = s.steps.map(st => {
+    const m = STEP_META[st.kind];
+    return `
+      <li class="plan-step ${m.cls}">
+        <span class="step-icon" aria-hidden="true">${m.icon}</span>
+        <div class="step-text">
+          <span class="step-head"><strong>${st.label}</strong> <span class="step-time">${st.time}</span></span>
+          <p>${st.body}</p>
+        </div>
+      </li>`;
+  }).join("");
+  const practiceBtn = s.lessonId
+    ? `<button class="plan-go-btn" data-plan-lesson="${s.lessonId}">${done ? "🌸 Revisit practice" : "Open practice in MathBloom"} →</button>`
+    : "";
+  return `
+    <article class="plan-session ${done ? "is-done" : ""}">
+      <header class="ps-head">
+        <span class="ps-label">${s.label}</span>
+        <div class="ps-titles">
+          <span class="ps-day">${s.day} · ${s.minutes}</span>
+          <h4>${s.title}${done ? ' <span class="ps-grown">✓ grown</span>' : ""}</h4>
+        </div>
+      </header>
+      <p class="ps-objective">${s.objective}</p>
+      <div class="im-chips">${imChips}</div>
+      <ol class="plan-steps">${steps}</ol>
+      <div class="ps-coach"><span class="coach-tag">💛 Coach note</span> ${s.coach}</div>
+      ${practiceBtn ? `<div class="ps-actions">${practiceBtn}</div>` : ""}
+    </article>`;
+}
+
+function planWeekHTML(w, i) {
+  const total = w.sessions.length;
+  const done = w.sessions.filter(sessionDone).length;
+  return `
+    <section class="plan-week rise d${i + 2}">
+      <header class="pw-head">
+        <span class="pw-num">Week ${w.n}</span>
+        <div class="pw-meta">
+          <h3>${w.focus}</h3>
+          <span class="pw-dates">${w.dates} · ${done}/${total} sessions grown</span>
+        </div>
+        <span class="pw-progress">${done === total && total ? "🌈" : `${done}/${total}`}</span>
+      </header>
+      <div class="pw-cando"><span class="cando-tag">🎯 Can-do goal</span> ${w.canDo}</div>
+      <div class="pw-sessions">
+        ${w.sessions.map(planSessionHTML).join("")}
+      </div>
+    </section>`;
+}
+
+function renderPlan() {
+  const P = SUMMER_PLAN;
+  const allSessions = P.weeks.flatMap(w => w.sessions);
+  const grown = allSessions.filter(sessionDone).length;
+
+  view.innerHTML = `
+    <nav class="crumbs rise"><a href="#" data-home>← My garden</a> <span>/ Summer plan</span></nav>
+    <header class="plan-hero rise d1">
+      <span class="hero-kicker">${P.subtitle}</span>
+      <h1>${P.title} <em>· Weeks 1–2</em></h1>
+      <div class="plan-facts">
+        <span class="plan-fact">🗓️ ${P.range}</span>
+        <span class="plan-fact">⏱️ ${P.cadence}</span>
+        <span class="plan-fact">🌸 ${grown}/${allSessions.length} sessions grown</span>
+      </div>
+      <p class="plan-intro">${P.intro}</p>
+    </header>
+
+    ${P.weeks.map(planWeekHTML).join("")}
+
+    <section class="plan-rest rise d4">
+      <h3>The rest of summer</h3>
+      <p class="plan-rest-sub">Weeks 3–10 unlock the same way: Unit 4 wraps up, then proportional relationships (Unit 8), then percentages (Unit 9). We'll build these out as you reach them.</p>
+      <div class="rest-grid">
+        ${P.upcoming.map(u => `
+          <button class="rest-card tint-${u.unit === "u4" ? "peach" : u.unit === "u8" ? "lilac" : "honey"}" data-plan-unit="${u.unit}">
+            <span class="rest-num">Week ${u.n}</span>
+            <span class="rest-dates">${u.dates}</span>
+            <span class="rest-focus">${u.focus}</span>
+          </button>`).join("")}
+      </div>
+    </section>
+
+    <section class="plan-resources rise d5">
+      <h3>Free resources</h3>
+      <div class="res-list">
+        ${P.resources.map(r => `
+          <a class="res-row" href="${r.url}" target="_blank" rel="noopener">
+            <span class="res-label">${r.label} ↗</span>
+            <span class="res-note">${r.note}</span>
+          </a>`).join("")}
+      </div>
+      <p class="plan-footnote">Previewing means exposure, not mastery — the goal is that these units feel familiar next year. It's fine to leave a few rough edges. 🌱</p>
+    </section>`;
+
+  view.querySelector("[data-home]").addEventListener("click", e => { e.preventDefault(); go(renderHome); });
+  view.querySelectorAll("[data-plan-lesson]").forEach(b =>
+    b.addEventListener("click", () => {
+      const id = b.dataset.planLesson;
+      go(() => renderLesson(id, isLearned(id) ? "practice" : "learn"));
+    }));
+  view.querySelectorAll("[data-plan-unit]").forEach(b =>
+    b.addEventListener("click", () => go(() => renderUnit(b.dataset.planUnit))));
+  window.scrollTo({ top: 0 });
+}
+
 // ---------- boot ----------
-document.getElementById("logoLink").addEventListener("click", e => { e.preventDefault(); go(renderHome); });
-renderHome();
+document.getElementById("planBtn").addEventListener("click", () => { location.hash = "plan"; go(renderPlan); });
+document.getElementById("logoLink").addEventListener("click", e => { e.preventDefault(); if (location.hash) location.hash = ""; go(renderHome); });
+if (location.hash === "#plan") renderPlan(); else renderHome();

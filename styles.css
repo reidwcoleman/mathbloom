@@ -140,6 +140,7 @@ body {
 .rise.d1 { animation-delay: .06s; } .rise.d2 { animation-delay: .14s; }
 .rise.d3 { animation-delay: .22s; } .rise.d4 { animation-delay: .30s; }
 .rise.d5 { animation-delay: .38s; } .rise.d6 { animation-delay: .46s; }
+.rise.d1b { animation-delay: .10s; }
 @keyframes rise { to { opacity: 1; transform: none; } }
 
 /* ---------- home / hero ---------- */
@@ -683,4 +684,162 @@ body.dusk .toast { background: var(--sage-soft); color: var(--ink); }
   color: var(--deep); background: var(--sage-soft); border: 1.5px dashed var(--sage);
   border-radius: var(--radius-sm); padding: 18px 14px; margin: 14px 0 6px;
   user-select: all;
+}
+
+/* ============================================================
+   SUMMER PLAN
+   ============================================================ */
+
+/* home CTA banner */
+.plan-cta {
+  display: flex; align-items: center; gap: 16px; width: 100%;
+  margin: 22px 0 4px; padding: 18px 22px; text-align: left; cursor: pointer;
+  background: linear-gradient(115deg, var(--butter-soft), var(--peach-soft));
+  border: 1.5px solid var(--butter); border-radius: var(--radius);
+  box-shadow: var(--shadow); transition: transform .25s ease, box-shadow .25s ease;
+}
+.plan-cta:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.plan-cta-emoji { font-size: 2rem; flex: 0 0 auto; }
+.plan-cta-text { flex: 1 1 auto; }
+.plan-cta-kicker { font-size: .72rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--amber); }
+.plan-cta-text h3 { font-family: var(--font-display); font-weight: 640; font-size: 1.18rem; color: var(--ink); margin: 2px 0 3px; }
+.plan-cta-text p { color: var(--ink-soft); font-size: .9rem; }
+.plan-cta-go { font-size: 1.5rem; color: var(--amber); flex: 0 0 auto; transition: transform .2s ease; }
+.plan-cta:hover .plan-cta-go { transform: translateX(5px); }
+
+/* plan hero */
+.plan-hero { margin-bottom: 8px; }
+.plan-hero h1 { font-family: var(--font-display); font-weight: 640; font-size: clamp(1.8rem, 5vw, 2.6rem); color: var(--ink); margin: 4px 0 14px; }
+.plan-hero h1 em { color: var(--deep); font-style: italic; }
+.plan-facts { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+.plan-fact {
+  font-size: .82rem; font-weight: 700; color: var(--ink-soft);
+  background: var(--card); border: 1.5px solid var(--cream-2);
+  border-radius: 999px; padding: 7px 14px; box-shadow: 0 4px 14px -8px rgba(62,78,65,.25);
+}
+.plan-intro { color: var(--ink-soft); font-size: 1rem; max-width: 60ch; line-height: 1.6; }
+
+/* week block */
+.plan-week {
+  background: var(--card); border: 1.5px solid var(--cream-2);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+  padding: 22px 22px 24px; margin: 18px 0;
+}
+.pw-head { display: flex; align-items: center; gap: 14px; }
+.pw-num {
+  font-family: var(--font-display); font-weight: 640; font-size: .82rem; letter-spacing: .04em;
+  color: var(--btn-fg); background: var(--deep); border-radius: 999px;
+  padding: 6px 14px; flex: 0 0 auto; white-space: nowrap;
+}
+.pw-meta { flex: 1 1 auto; }
+.pw-meta h3 { font-family: var(--font-display); font-weight: 640; font-size: 1.25rem; color: var(--ink); }
+.pw-dates { font-size: .85rem; color: var(--ink-soft); font-weight: 700; }
+.pw-progress { font-size: 1.1rem; font-weight: 800; color: var(--deep); flex: 0 0 auto; }
+.pw-cando {
+  background: var(--sage-soft); border-radius: var(--radius-sm);
+  padding: 12px 16px; margin: 14px 0 18px; font-size: .94rem; color: var(--ink);
+}
+.cando-tag, .coach-tag {
+  display: inline-block; font-size: .72rem; font-weight: 800; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--deep); margin-right: 6px;
+}
+
+/* session card */
+.pw-sessions { display: flex; flex-direction: column; gap: 16px; }
+.plan-session {
+  background: var(--cream); border: 1.5px solid var(--cream-2);
+  border-radius: var(--radius-sm); padding: 18px 20px;
+  transition: border-color .25s ease;
+}
+.plan-session.is-done { background: linear-gradient(120deg, var(--cream), var(--sage-soft)); border-color: var(--sage); }
+.ps-head { display: flex; align-items: flex-start; gap: 12px; }
+.ps-label {
+  font-family: var(--font-display); font-weight: 640; font-size: .9rem;
+  color: var(--btn-fg); background: var(--peach); border-radius: 10px;
+  width: 38px; height: 38px; display: grid; place-items: center; flex: 0 0 auto;
+}
+.plan-session.is-done .ps-label { background: var(--deep); }
+.ps-titles { flex: 1 1 auto; }
+.ps-day { font-size: .76rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-soft); }
+.ps-titles h4 { font-family: var(--font-display); font-weight: 640; font-size: 1.12rem; color: var(--ink); margin-top: 1px; }
+.ps-grown { font-size: .72rem; font-weight: 800; color: var(--deep); background: var(--card); border-radius: 999px; padding: 2px 9px; vertical-align: middle; }
+.ps-objective { color: var(--ink-soft); font-size: .92rem; line-height: 1.55; margin: 12px 0; }
+
+.im-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.im-chip {
+  font-size: .78rem; font-weight: 700; color: var(--deep); text-decoration: none;
+  background: var(--butter-soft); border: 1.5px solid var(--butter);
+  border-radius: 999px; padding: 5px 12px; transition: background .2s ease, transform .2s ease;
+}
+.im-chip:hover { background: var(--butter); transform: translateY(-1px); }
+
+/* run-of-session steps */
+.plan-steps { list-style: none; display: flex; flex-direction: column; gap: 2px; margin: 0; padding: 0; }
+.plan-step { display: flex; gap: 12px; padding: 11px 0; align-items: flex-start; border-top: 1px solid rgba(92,111,98,.12); }
+.plan-step:first-child { border-top: none; }
+.step-icon {
+  flex: 0 0 auto; width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center;
+  font-size: .95rem; font-weight: 800; background: var(--card); border: 1.5px solid var(--cream-2);
+}
+.step-warmup .step-icon { background: var(--butter-soft); border-color: var(--butter); }
+.step-learn .step-icon { background: var(--lav-soft); border-color: var(--lav); }
+.step-practice .step-icon { background: var(--peach-soft); border-color: var(--peach); }
+.step-check .step-icon { background: var(--sage-soft); border-color: var(--sage); color: var(--deep); }
+.step-text { flex: 1 1 auto; }
+.step-head { display: flex; align-items: baseline; gap: 8px; }
+.step-head strong { color: var(--ink); font-size: .95rem; }
+.step-time { font-size: .72rem; font-weight: 700; color: var(--ink-soft); }
+.step-text p { color: var(--ink-soft); font-size: .9rem; line-height: 1.55; margin-top: 2px; }
+.step-text strong { color: var(--ink); }
+
+/* coach note + action */
+.ps-coach {
+  margin-top: 14px; padding: 12px 16px; font-size: .9rem; line-height: 1.55; color: var(--ink);
+  background: var(--rose-soft); border-radius: var(--radius-sm); border: 1.5px solid var(--rose);
+}
+.ps-coach .coach-tag { color: var(--rose); }
+.ps-actions { margin-top: 14px; }
+.plan-go-btn {
+  font-family: var(--font-body); font-weight: 800; font-size: .92rem; color: var(--btn-fg);
+  background: var(--deep); border: none; border-radius: 999px; padding: 11px 20px; cursor: pointer;
+  box-shadow: 0 8px 20px -10px rgba(62,107,79,.6); transition: transform .2s ease, box-shadow .2s ease;
+}
+.plan-go-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -12px rgba(62,107,79,.7); }
+
+/* rest of summer */
+.plan-rest { margin: 26px 0 10px; }
+.plan-rest h3, .plan-resources h3 { font-family: var(--font-display); font-weight: 640; font-size: 1.3rem; color: var(--ink); }
+.plan-rest-sub { color: var(--ink-soft); font-size: .92rem; margin: 6px 0 16px; max-width: 58ch; }
+.rest-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+.rest-card {
+  text-align: left; cursor: pointer; padding: 14px 16px; display: flex; flex-direction: column; gap: 3px;
+  border: 1.5px solid var(--cream-2); border-radius: var(--radius-sm); background: var(--card);
+  box-shadow: 0 6px 18px -10px rgba(62,78,65,.18); transition: transform .2s ease, box-shadow .2s ease;
+}
+.rest-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+.rest-card.tint-peach { background: linear-gradient(125deg, var(--card), var(--peach-soft)); }
+.rest-card.tint-lilac { background: linear-gradient(125deg, var(--card), var(--lav-soft)); }
+.rest-card.tint-honey { background: linear-gradient(125deg, var(--card), var(--butter-soft)); }
+.rest-num { font-family: var(--font-display); font-weight: 640; font-size: 1rem; color: var(--deep); }
+.rest-dates { font-size: .76rem; font-weight: 700; color: var(--ink-soft); }
+.rest-focus { font-size: .88rem; color: var(--ink); margin-top: 2px; }
+
+/* resources */
+.plan-resources { margin: 24px 0 12px; }
+.res-list { display: flex; flex-direction: column; gap: 10px; margin: 14px 0 18px; }
+.res-row {
+  display: flex; flex-direction: column; gap: 2px; text-decoration: none;
+  background: var(--card); border: 1.5px solid var(--cream-2); border-radius: var(--radius-sm);
+  padding: 13px 18px; box-shadow: 0 6px 18px -10px rgba(62,78,65,.18); transition: transform .2s ease, border-color .2s ease;
+}
+.res-row:hover { transform: translateX(4px); border-color: var(--sage); }
+.res-label { font-weight: 800; color: var(--deep); font-size: .96rem; }
+.res-note { font-size: .85rem; color: var(--ink-soft); }
+.plan-footnote { color: var(--ink-soft); font-size: .9rem; font-style: italic; line-height: 1.55; max-width: 56ch; }
+
+@media (max-width: 560px) {
+  .plan-cta { flex-wrap: wrap; }
+  .plan-cta-go { display: none; }
+  .pw-head { flex-wrap: wrap; }
+  .plan-session { padding: 16px 15px; }
 }
