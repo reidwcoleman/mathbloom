@@ -666,3 +666,21 @@ body.dusk .toast { background: var(--sage-soft); color: var(--ink); }
   .hero h1 { font-size: 2.05rem; }
   .breath-btn span.breath-label { display: none; }
 }
+
+/* ---------- cloud save panel ---------- */
+.sync-body { text-align: center; min-height: 0; }
+.sync-block { padding: 6px 0; }
+.sync-label { font-weight: 800; font-size: .92rem; margin-bottom: 10px; }
+.sync-note { color: var(--ink-soft); font-size: .82rem; margin-top: 10px; }
+.sync-input { width: 240px; text-align: center; }
+.sync-divider {
+  display: flex; align-items: center; gap: 12px; margin: 18px 0;
+  color: var(--ink-soft); font-size: .8rem; font-weight: 800;
+}
+.sync-divider::before, .sync-divider::after { content: ""; flex: 1; height: 1.5px; background: var(--cream-2); }
+.sync-code {
+  font-family: var(--font-display); font-weight: 640; font-size: 1.9rem; letter-spacing: .02em;
+  color: var(--deep); background: var(--sage-soft); border: 1.5px dashed var(--sage);
+  border-radius: var(--radius-sm); padding: 18px 14px; margin: 14px 0 6px;
+  user-select: all;
+}

@@ -38,6 +38,17 @@ its lesson. A "continue where you left off" card and progress stats round out th
 - Mastery = 5 correct answers ("petals"), any number of attempts, any pace
 - Answers accept fractions (`1/2`), decimals, `$`, and `%`
 
+## Saving
+
+Progress saves automatically in the browser (localStorage) — no account needed to start.
+For cross-device saves, the ☁️ **Cloud save** panel creates a friendly **garden code**
+(like `fern-tulip-482`) — no email or password. Enter the code on any device and the
+gardens merge (progress only ever grows). Backed by a Supabase table
+(`mathbloom_gardens`: code / jsonb data / updated_at) with RLS — the unguessable code
+is the per-garden secret; there is no delete policy. Sync is local-first: cloud pushes
+are debounced after each save, fetched + merged on boot, and failures fall back
+silently to local with auto-retry on the next save.
+
 ## Running it
 
 No build step, no dependencies, no accounts. Progress saves in the browser via localStorage.
