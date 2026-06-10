@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MathBloom — math practice that grows with you</title>
+<meta name="description" content="Calm, joyful math practice for Math 6 Plus: scale drawings, proportional relationships, and percentages. No timers. No grades. Just growing.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,560;0,9..144,640;1,9..144,460&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>🌸</text></svg>">
+</head>
+<body>
+
+<div class="bg-blobs" aria-hidden="true">
+  <div class="blob blob-a"></div>
+  <div class="blob blob-b"></div>
+  <div class="blob blob-c"></div>
+</div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="topbar">
+  <a class="logo" href="#" id="logoLink" aria-label="MathBloom home">
+    <svg class="logo-flower" viewBox="0 0 48 48" width="34" height="34" aria-hidden="true">
+      <g class="petals">
+        <ellipse cx="24" cy="12" rx="7" ry="11" fill="#F2A07B"/>
+        <ellipse cx="24" cy="36" rx="7" ry="11" fill="#F2A07B"/>
+        <ellipse cx="12" cy="24" rx="11" ry="7" fill="#E9A0A8"/>
+        <ellipse cx="36" cy="24" rx="11" ry="7" fill="#E9A0A8"/>
+        <ellipse cx="15" cy="15" rx="8" ry="8" fill="#F6D88C"/>
+        <ellipse cx="33" cy="15" rx="8" ry="8" fill="#F6D88C"/>
+        <ellipse cx="15" cy="33" rx="8" ry="8" fill="#C9B8E8"/>
+        <ellipse cx="33" cy="33" rx="8" ry="8" fill="#C9B8E8"/>
+      </g>
+      <circle cx="24" cy="24" r="8.5" fill="#3E6B4F"/>
+    </svg>
+    <span class="logo-text">Math<em>Bloom</em></span>
+  </a>
+  <nav class="topnav">
+    <button class="breath-btn" id="breathBtn" type="button">
+      <span class="breath-dot"></span> Take a breath
+    </button>
+  </nav>
+</header>
+
+<main id="view" class="view"></main>
+
+<footer class="footer">
+  <p>Made for Math 6 Plus (Wake County / Open Up Resources units 4, 8 &amp; 9).
+  No timers. No grades. Mistakes are how flowers grow. 🌱</p>
+</footer>
+
+<!-- Breathing overlay -->
+<div class="breath-overlay" id="breathOverlay" hidden>
+  <div class="breath-stage">
+    <div class="breath-circle"><span id="breathLabel">breathe in…</span></div>
+    <p class="breath-sub">In for four… out for four. Stay as long as you like.</p>
+    <button class="btn btn-ghost" id="breathClose" type="button">I'm ready to go back</button>
+  </div>
+</div>
+
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<script src="lessons.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
