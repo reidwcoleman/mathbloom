@@ -23,8 +23,35 @@ function loadProgress() {
   if (!raw.totals) raw.totals = { answered: 0, correct: 0 };
   return raw;
 }
-function saveProgress() { localStorage.setItem(STORE_KEY, JSON.stringify(progress)); }
+function saveProgress() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(progress)); }
+  catch (e) { console.warn("save failed", e); }
+}
 let progress = loadProgress();
+saveProgress(); // persist any v1→v2 migration immediately
+
+// extra safety: flush on tab hide/close
+addEventListener("pagehide", saveProgress);
+addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") saveProgress(); });
+
+// gentle "saved" toast
+function toast(msg) {
+  document.querySelectorAll(".toast").forEach(t => t.remove());
+  const t = document.createElement("div");
+  t.className = "toast";
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2300);
+}
+
+// smooth view transitions
+let navLock = false;
+function go(fn) {
+  if (navLock) { fn(); return; }
+  navLock = true;
+  view.style.opacity = "0";
+  setTimeout(() => { fn(); view.style.opacity = "1"; navLock = false; }, 160);
+}
 
 function lessonState(id) {
   if (!progress.lessons[id]) progress.lessons[id] = { stars: 0, learned: false, attempts: 0, correct: 0 };
@@ -193,12 +220,12 @@ function unitProgress(u) {
 }
 function wireGarden(scope) {
   scope.querySelectorAll("[data-plant]").forEach(g => {
-    const go = () => {
+    const visit = () => {
       const id = g.dataset.plant;
-      renderLesson(id, growthStage(id) >= 1 ? "practice" : "learn");
+      go(() => renderLesson(id, growthStage(id) >= 1 ? "practice" : "learn"));
     };
-    g.addEventListener("click", go);
-    g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
+    g.addEventListener("click", visit);
+    g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); visit(); } });
   });
 }
 
@@ -280,10 +307,10 @@ function renderHome() {
     </section>`;
 
   view.querySelectorAll("[data-unit]").forEach(b =>
-    b.addEventListener("click", () => renderUnit(b.dataset.unit)));
+    b.addEventListener("click", () => go(() => renderUnit(b.dataset.unit))));
   const cont = view.querySelector("#continueBtn");
   if (cont) cont.addEventListener("click", () => {
-    renderLesson(progress.lastLesson, isLearned(progress.lastLesson) ? "practice" : "learn");
+    go(() => renderLesson(progress.lastLesson, isLearned(progress.lastLesson) ? "practice" : "learn"));
   });
   wireGarden(view);
   window.scrollTo({ top: 0 });
@@ -324,11 +351,11 @@ function renderUnit(uid) {
       <p>Already bloomed a lesson? It stays bloomed forever — but you can always come back for extra practice. Gardens love attention.</p>
     </div>`;
 
-  view.querySelector("[data-home]").addEventListener("click", e => { e.preventDefault(); renderHome(); });
+  view.querySelector("[data-home]").addEventListener("click", e => { e.preventDefault(); go(renderHome); });
   view.querySelectorAll("[data-lesson]").forEach(b =>
     b.addEventListener("click", () => {
       const id = b.dataset.lesson;
-      renderLesson(id, isLearned(id) ? "practice" : "learn");
+      go(() => renderLesson(id, isLearned(id) ? "practice" : "learn"));
     }));
   window.scrollTo({ top: 0 });
 }
@@ -354,24 +381,59 @@ function renderLesson(lid, tab) {
         <button class="tab ${tab === "practice" ? "active" : ""}" data-tab="practice">🌸 Practice${isBloomed(lid) ? ' <span class="tab-check">✓</span>' : ""}</button>
       </div>
     </header>
-    <div id="panel"></div>`;
+    <div id="panel"></div>
+    ${lessonNavHTML(lid)}`;
 
-  view.querySelector("[data-home]").addEventListener("click", e => { e.preventDefault(); renderHome(); });
-  view.querySelector("[data-unit]").addEventListener("click", e => { e.preventDefault(); renderUnit(unit.id); });
+  view.querySelector("[data-home]").addEventListener("click", e => { e.preventDefault(); go(renderHome); });
+  view.querySelector("[data-unit]").addEventListener("click", e => { e.preventDefault(); go(() => renderUnit(unit.id)); });
   view.querySelectorAll("[data-tab]").forEach(b =>
-    b.addEventListener("click", () => renderLesson(lid, b.dataset.tab)));
+    b.addEventListener("click", () => {
+      if (b.dataset.tab === tab) return;
+      renderLesson(lid, b.dataset.tab);
+    }));
+  view.querySelectorAll("[data-nav-lesson]").forEach(b =>
+    b.addEventListener("click", () => {
+      const id = b.dataset.navLesson;
+      go(() => renderLesson(id, isLearned(id) ? "practice" : "learn"));
+    }));
 
   if (tab === "learn") renderLearn(lesson);
   else renderPractice(lesson);
   window.scrollTo({ top: 0 });
 }
 
+function lessonNavHTML(lid) {
+  const flat = UNITS.flatMap(u => u.lessons);
+  const i = flat.findIndex(l => l.id === lid);
+  const prev = flat[i - 1], next = flat[i + 1];
+  return `
+  <div class="lesson-nav-row">
+    <button class="lesson-nav-btn" ${prev ? `data-nav-lesson="${prev.id}"` : "disabled"}>
+      <span class="ln-kicker">← Previous lesson</span>
+      <span class="ln-title">${prev ? prev.title : ""}</span>
+    </button>
+    <button class="lesson-nav-btn next" ${next ? `data-nav-lesson="${next.id}"` : "disabled"}>
+      <span class="ln-kicker">Next lesson →</span>
+      <span class="ln-title">${next ? next.title : ""}</span>
+    </button>
+  </div>`;
+}
+
 // ---------- LEARN (paged walk-through) ----------
 function renderLearn(lesson) {
   const panel = document.getElementById("panel");
   const pages = lesson.pages;
-  let idx = 0;
-  const seen = new Set([0]);
+  const st = lessonState(lesson.id);
+  let idx = Math.min(st.learnPage || 0, pages.length - 1); // resume where you left off
+  const seen = new Set(Array.from({ length: idx + 1 }, (_, i) => i));
+  if (idx > 0) setTimeout(() => toast("Picked up right where you left off 🌿"), 400);
+
+  function setPage(i) {
+    idx = i;
+    seen.add(i);
+    st.learnPage = i;
+    saveProgress();
+  }
 
   function drawPage() {
     const page = pages[idx];
@@ -393,9 +455,9 @@ function renderLearn(lesson) {
         </div>
       </div>`;
 
-    panel.querySelector("#backBtn").addEventListener("click", () => { if (idx > 0) { idx--; drawPage(); } });
+    panel.querySelector("#backBtn").addEventListener("click", () => { if (idx > 0) { setPage(idx - 1); drawPage(); } });
     panel.querySelector("#nextBtn").addEventListener("click", () => {
-      if (!isLast) { idx++; seen.add(idx); drawPage(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+      if (!isLast) { setPage(idx + 1); drawPage(); window.scrollTo({ top: 0, behavior: "smooth" }); }
       else finishLearn();
     });
     wireCheckpoint(panel, page.checkpoint);
@@ -433,8 +495,10 @@ function renderLearn(lesson) {
 
   function finishLearn() {
     const first = !isLearned(lesson.id);
-    lessonState(lesson.id).learned = true;
+    st.learned = true;
+    st.learnPage = 0; // future visits start fresh as a review
     saveProgress();
+    toast(first ? "Lesson saved ✓ — it stays learned forever" : "Review saved ✓");
     if (first) smallConfetti();
     panel.innerHTML = `
       <div class="learn rise">
@@ -450,8 +514,8 @@ function renderLearn(lesson) {
           </div>
         </div>
       </div>`;
-    panel.querySelector("#toPractice").addEventListener("click", () => renderLesson(lesson.id, "practice"));
-    panel.querySelector("#toUnit").addEventListener("click", () => renderUnit(findLesson(lesson.id).unit.id));
+    panel.querySelector("#toPractice").addEventListener("click", () => go(() => renderLesson(lesson.id, "practice")));
+    panel.querySelector("#toUnit").addEventListener("click", () => go(() => renderUnit(findLesson(lesson.id).unit.id)));
   }
 
   drawPage();
@@ -488,6 +552,7 @@ function renderPractice(lesson) {
         <span class="bloom-petals">
           ${Array.from({ length: GOAL }, (_, j) => `<span class="bloom-petal ${j < s ? "full" : ""}"></span>`).join("")}
         </span>
+        <span class="label" style="margin-left:auto;font-size:.74rem;opacity:.75">✓ saves automatically</span>
       </div>`;
   }
 
@@ -690,7 +755,11 @@ function renderPractice(lesson) {
 
   function bloomCelebration() {
     bigConfetti();
-    const allBloomed = UNITS.flatMap(u => u.lessons).every(l => isBloomed(l.id));
+    toast("Bloom saved forever 🌸");
+    const flat = UNITS.flatMap(u => u.lessons);
+    const allBloomed = flat.every(l => isBloomed(l.id));
+    const here = flat.findIndex(l => l.id === lesson.id);
+    const nextUp = flat.slice(here + 1).find(l => !isBloomed(l.id)) || flat.find(l => !isBloomed(l.id));
     panel.innerHTML = `
       <div class="practice">
         <div class="bloom-banner">
@@ -701,14 +770,15 @@ function renderPractice(lesson) {
           <p>Five petals, fully open — and <strong>saved forever</strong>. You never have to redo this lesson; it's yours now. Hints, retries, breaths and all: you grew it yourself.</p>
           ${allBloomed ? `<p style="font-weight:800;color:var(--deep)">🌈 And that's every single lesson — your whole meadow is in bloom. Go look at your garden!</p>` : ""}
           <div class="q-actions" style="justify-content:center">
-            <button class="btn btn-primary" id="seeGarden">See it in my garden 🌷</button>
-            <button class="btn btn-ghost" id="backUnit">Back to the unit</button>
+            ${nextUp ? `<button class="btn btn-primary" id="nextLesson">Next up: ${nextUp.title} →</button>` : ""}
+            <button class="btn ${nextUp ? "btn-ghost" : "btn-primary"}" id="seeGarden">See it in my garden 🌷</button>
             <button class="btn btn-ghost" id="keepGoing">Keep practicing</button>
           </div>
         </div>
       </div>`;
-    panel.querySelector("#seeGarden").addEventListener("click", renderHome);
-    panel.querySelector("#backUnit").addEventListener("click", () => renderUnit(findLesson(lesson.id).unit.id));
+    if (nextUp) panel.querySelector("#nextLesson").addEventListener("click", () =>
+      go(() => renderLesson(nextUp.id, isLearned(nextUp.id) ? "practice" : "learn")));
+    panel.querySelector("#seeGarden").addEventListener("click", () => go(renderHome));
     panel.querySelector("#keepGoing").addEventListener("click", nextQuestion);
   }
 
@@ -801,27 +871,92 @@ function calmBreathe() {
   clearCalmTimers();
   calmBody.innerHTML = `
     <div class="breathe-tool">
-      <div class="breath-circle" id="breathCircle"><span id="breathLabel">breathe in…</span></div>
+      <div class="breath-circle grow" id="breathCircle">
+        <span><span id="breathLabel">breathe in…</span><span class="breath-count" id="breathCount">4</span></span>
+      </div>
       <div class="phase-dots">${[0, 1, 2, 3].map(i => `<span class="phase-dot ${i === 0 ? "on" : ""}"></span>`).join("")}</div>
-      <p>Box breathing: in for 4 — hold — out for 4 — hold. Follow the circle.</p>
+      <p>Box breathing: in for 4 — hold — out for 4 — hold.<br>Follow the circle and the count. Around and around, as long as you like.</p>
     </div>`;
   const circle = document.getElementById("breathCircle");
   const label = document.getElementById("breathLabel");
+  const count = document.getElementById("breathCount");
   const phases = [
     { text: "breathe in…", cls: "grow" },
     { text: "hold…", cls: "grow" },
     { text: "breathe out…", cls: "shrink" },
     { text: "hold…", cls: "shrink" }
   ];
-  let ph = 0;
-  circle.classList.add("grow");
+  let t = 0; // seconds, 0..15 looping
   calmTimers.push(setInterval(() => {
-    ph = (ph + 1) % 4;
-    label.textContent = phases[ph].text;
-    circle.classList.remove("grow", "shrink");
-    circle.classList.add(phases[ph].cls);
-    calmBody.querySelectorAll(".phase-dot").forEach((d, i) => d.classList.toggle("on", i === ph));
-  }, 4000));
+    t = (t + 1) % 16;
+    const ph = Math.floor(t / 4);
+    count.textContent = 4 - (t % 4);
+    if (t % 4 === 0) {
+      label.textContent = phases[ph].text;
+      circle.classList.remove("grow", "shrink");
+      circle.classList.add(phases[ph].cls);
+      calmBody.querySelectorAll(".phase-dot").forEach((d, i) => d.classList.toggle("on", i === ph));
+    }
+  }, 1000));
+}
+
+// rain sounds — soft brown noise through a low-pass filter (no files needed)
+let rainCtx = null, rainGain = null, rainOn = false;
+function ensureRain() {
+  if (rainCtx) return;
+  rainCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const seconds = 4;
+  const buffer = rainCtx.createBuffer(1, seconds * rainCtx.sampleRate, rainCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+  let last = 0;
+  for (let i = 0; i < data.length; i++) {
+    const white = Math.random() * 2 - 1;
+    last = (last + 0.02 * white) / 1.02;
+    data[i] = last * 3.5;
+  }
+  const src = rainCtx.createBufferSource();
+  src.buffer = buffer;
+  src.loop = true;
+  const filter = rainCtx.createBiquadFilter();
+  filter.type = "lowpass";
+  filter.frequency.value = 850;
+  rainGain = rainCtx.createGain();
+  rainGain.gain.value = 0;
+  src.connect(filter); filter.connect(rainGain); rainGain.connect(rainCtx.destination);
+  src.start();
+}
+function setRain(on) {
+  ensureRain();
+  rainCtx.resume();
+  rainOn = on;
+  const t = rainCtx.currentTime;
+  rainGain.gain.cancelScheduledValues(t);
+  rainGain.gain.setValueAtTime(rainGain.gain.value, t);
+  rainGain.gain.linearRampToValueAtTime(on ? 0.45 : 0, t + 1.2);
+  const btn = document.getElementById("rainToggle");
+  if (btn) btn.textContent = on ? "⏸ Pause the rain" : "▶ Start the rain";
+}
+function calmRain() {
+  clearCalmTimers();
+  calmBody.innerHTML = `
+    <div class="rain-tool">
+      <svg class="rain-art" viewBox="0 0 160 90" width="170" aria-hidden="true">
+        <ellipse cx="70" cy="28" rx="38" ry="17" fill="#B9C9D6"/>
+        <ellipse cx="100" cy="22" rx="30" ry="14" fill="#C9D6E0"/>
+        <ellipse cx="45" cy="22" rx="24" ry="12" fill="#C9D6E0"/>
+        <g stroke="#8FB6CC" stroke-width="3" stroke-linecap="round">
+          <line class="rain-drop"    x1="45" y1="44" x2="42" y2="54"/>
+          <line class="rain-drop r2" x1="70" y1="46" x2="67" y2="56"/>
+          <line class="rain-drop r3" x1="95" y1="44" x2="92" y2="54"/>
+          <line class="rain-drop r4" x1="120" y1="42" x2="117" y2="52"/>
+          <line class="rain-drop r5" x1="58" y1="42" x2="55" y2="52"/>
+        </g>
+      </svg>
+      <p>Soft, steady rain — generated right here, no internet needed.<br>Lots of people find it easier to focus with a little weather.</p>
+      <button class="btn btn-primary rain-toggle" id="rainToggle">${rainOn ? "⏸ Pause the rain" : "▶ Start the rain"}</button>
+      <p class="rain-note">🌧️ The rain keeps falling even after you close this panel — practice to it, if you like. Come back here to pause it.</p>
+    </div>`;
+  document.getElementById("rainToggle").addEventListener("click", () => setRain(!rainOn));
 }
 
 function calmGround() {
@@ -874,21 +1009,27 @@ function calmWords() {
   drawCard();
 }
 
-const CALM_TOOLS = { breathe: calmBreathe, ground: calmGround, words: calmWords };
+const CALM_TOOLS = { breathe: calmBreathe, ground: calmGround, words: calmWords, rain: calmRain };
+
+let lastCalmTab = localStorage.getItem("mathbloom-calmtab") || "breathe";
+if (!CALM_TOOLS[lastCalmTab]) lastCalmTab = "breathe";
 
 function openCalm() {
   calmOverlay.hidden = false;
-  document.querySelectorAll(".calm-tab").forEach(t => t.classList.toggle("active", t.dataset.calm === "breathe"));
-  calmBreathe();
+  document.querySelectorAll(".calm-tab").forEach(t => t.classList.toggle("active", t.dataset.calm === lastCalmTab));
+  CALM_TOOLS[lastCalmTab]();
 }
 document.getElementById("calmBtn").addEventListener("click", openCalm);
 document.getElementById("calmClose").addEventListener("click", () => { calmOverlay.hidden = true; clearCalmTimers(); });
 calmOverlay.addEventListener("click", e => { if (e.target === calmOverlay) { calmOverlay.hidden = true; clearCalmTimers(); } });
+addEventListener("keydown", e => { if (e.key === "Escape" && !calmOverlay.hidden) { calmOverlay.hidden = true; clearCalmTimers(); } });
 document.querySelectorAll(".calm-tab").forEach(t =>
   t.addEventListener("click", () => {
     document.querySelectorAll(".calm-tab").forEach(x => x.classList.remove("active"));
     t.classList.add("active");
-    CALM_TOOLS[t.dataset.calm]();
+    lastCalmTab = t.dataset.calm;
+    localStorage.setItem("mathbloom-calmtab", lastCalmTab);
+    CALM_TOOLS[lastCalmTab]();
   }));
 
 // ---------- dusk mode ----------
@@ -903,5 +1044,5 @@ duskBtn.addEventListener("click", () => applyDusk(!document.body.classList.conta
 applyDusk(localStorage.getItem("mathbloom-dusk") === "1");
 
 // ---------- boot ----------
-document.getElementById("logoLink").addEventListener("click", e => { e.preventDefault(); renderHome(); });
+document.getElementById("logoLink").addEventListener("click", e => { e.preventDefault(); go(renderHome); });
 renderHome();

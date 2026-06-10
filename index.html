@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,560;0,9..144,640;1,9..144,460&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400;1,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=2">
+<link rel="stylesheet" href="styles.css?v=3">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>🌸</text></svg>">
 </head>
 <body>
@@ -40,7 +40,7 @@
   <nav class="topnav">
     <button class="icon-btn" id="duskBtn" type="button" aria-label="Toggle dusk mode" title="Dusk mode">🌙</button>
     <button class="breath-btn" id="calmBtn" type="button">
-      <span class="breath-dot"></span> Calm corner
+      <span class="breath-dot"></span> <span class="breath-label">Calm corner</span>
     </button>
   </nav>
 </header>
@@ -65,6 +65,7 @@
       <button class="calm-tab active" data-calm="breathe">Breathe</button>
       <button class="calm-tab" data-calm="ground">Notice</button>
       <button class="calm-tab" data-calm="words">Kind words</button>
+      <button class="calm-tab" data-calm="rain">Rain</button>
     </div>
     <div class="calm-body" id="calmBody"></div>
   </div>
@@ -72,7 +73,7 @@
 
 <canvas id="confetti" aria-hidden="true"></canvas>
 
-<script src="lessons.js?v=2"></script>
-<script src="app.js?v=2"></script>
+<script src="lessons.js?v=3"></script>
+<script src="app.js?v=3"></script>
 </body>
 </html>
