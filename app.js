@@ -277,6 +277,8 @@ function renderHome() {
       </button>` : ""}
     </section>
 
+    ${typeof reviewHomeCardHTML === "function" ? reviewHomeCardHTML() : ""}
+
     <button class="plan-cta rise d1b" id="planCta">
       <span class="plan-cta-emoji">🗓️</span>
       <span class="plan-cta-text">
@@ -337,6 +339,7 @@ function renderHome() {
     go(() => renderLesson(progress.lastLesson, defaultTab(progress.lastLesson)));
   });
   view.querySelector("#planCta").addEventListener("click", () => go(renderPlan));
+  if (typeof wireReviewHome === "function") wireReviewHome(view);
   wireGarden(view);
   window.scrollTo({ top: 0 });
 }
