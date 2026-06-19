@@ -1,8 +1,8 @@
 /* ============================================================
    MathBloom — "Lessons to work on before next session"
    Two focused review lessons that live right under the hero:
-     1. Scale factor   (length scaling)
-     2. Area factor    (how area grows: scale factor squared)
+     1. Multiplication  (multi-digit, decimals, fractions)
+     2. Division        (whole numbers, decimals, fractions)
    Each lesson = a clear recap + 3 warm-ups + 10 practice problems.
    Self-contained: reuses the app's CSS + the global go()/view/renderHome.
    ============================================================ */
@@ -10,7 +10,10 @@
 (function () {
   "use strict";
 
-  const RKEY = "mathbloom-review-v1";
+  const RKEY = "mathbloom-review-v2";
+
+  // display order / numbering for the two lessons
+  const LNUM = { mult: 1, div: 2 };
 
   // ---- progress for the review section (separate from lesson garden) ----
   function loadReview() {
@@ -31,192 +34,210 @@
     return rdone[key] ? Object.keys(rdone[key]).length : 0;
   }
 
-  // ---- a small square-grid visual for the area recap ----
-  function svgAreaGrid(k) {
-    const u = 26, base = 1; // 1x1 original -> kxk copy
-    const W = u * k, pad = 30, gap = 40;
-    const totalW = u + gap + W + 70;
-    const totalH = W + 44;
-    const y1 = totalH - 24 - u, y2 = totalH - 24 - W;
+  // ---- array model: rows × cols squares -> a product (multiplication recap) ----
+  function svgArrayModel(rows, cols) {
+    const u = 24, padL = 16, padT = 14;
+    const gridW = cols * u, gridH = rows * u;
+    const totalW = padL * 2 + gridW;
+    const totalH = padT + gridH + 30;
     let cells = "";
-    for (let r = 0; r < k; r++) for (let c = 0; c < k; c++) {
-      cells += `<rect x="${pad + u + gap + c * u}" y="${y2 + r * u}" width="${u}" height="${u}" fill="#FBE3D4" stroke="#C9703F" stroke-width="1.5"/>`;
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+      cells += `<rect x="${padL + c * u + 2}" y="${padT + r * u + 2}" width="${u - 4}" height="${u - 4}" rx="4" fill="#FBE3D4" stroke="#C9703F" stroke-width="1.5"/>`;
     }
     return `
-    <svg viewBox="0 0 ${totalW} ${totalH}" width="${Math.min(totalW, 420)}" role="img" aria-label="A unit square and its scaled copy split into ${k * k} unit squares">
-      <rect x="${pad}" y="${y1}" width="${u}" height="${u}" rx="3" fill="#DCE9DD" stroke="#3E6B4F" stroke-width="2"/>
-      <text x="${pad + u / 2}" y="${y1 + u / 2 + 4}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="800" font-size="12" fill="#2E4036">1</text>
-      <text x="${pad + u / 2}" y="${totalH - 6}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="700" font-size="12" fill="#728A78">original</text>
+    <svg viewBox="0 0 ${totalW} ${totalH}" width="${Math.min(totalW, 300)}" role="img" aria-label="${rows} rows of ${cols} squares make ${rows * cols} in all">
       ${cells}
-      <text x="${pad + u + gap + W / 2}" y="${totalH - 6}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="700" font-size="12" fill="#728A78">scale ×${k} → ${k * k} squares</text>
+      <text x="${totalW / 2}" y="${totalH - 8}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="800" font-size="13" fill="#3E6B4F">${rows} × ${cols} = ${rows * cols}</text>
     </svg>`;
   }
 
-  const scaleVisual = (typeof svgScaledRects === "function")
-    ? svgScaledRects(3, 2, 2) : "";
+  // ---- groups model: a total shared into equal groups (division recap) ----
+  function svgGroupsModel(total, groups) {
+    const per = total / groups;
+    const r = 7, gap = 6, padX = 14, padY = 14, cols = 2;
+    const rows = Math.ceil(per / cols);
+    const groupW = cols * (2 * r + gap) + 8;
+    const groupH = rows * (2 * r + gap) + 8;
+    const totalW = padX + groups * (groupW + 12);
+    const totalH = padY + groupH + 28;
+    let g = "";
+    for (let gi = 0; gi < groups; gi++) {
+      const gx = padX + gi * (groupW + 12);
+      g += `<rect x="${gx}" y="${padY}" width="${groupW}" height="${groupH}" rx="12" fill="#EEF4EE" stroke="#3E6B4F" stroke-width="1.6"/>`;
+      for (let d = 0; d < per; d++) {
+        const dc = d % cols, dr = Math.floor(d / cols);
+        const cx = gx + 4 + r + dc * (2 * r + gap);
+        const cy = padY + 4 + r + dr * (2 * r + gap);
+        g += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#FBE3D4" stroke="#C9703F" stroke-width="1.4"/>`;
+      }
+    }
+    return `
+    <svg viewBox="0 0 ${totalW} ${totalH}" width="${Math.min(totalW, 340)}" role="img" aria-label="${total} shared into ${groups} groups of ${per}">
+      ${g}
+      <text x="${totalW / 2}" y="${totalH - 7}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="800" font-size="13" fill="#3E6B4F">${total} ÷ ${groups} = ${per}</text>
+    </svg>`;
+  }
 
   // ============================================================
   //  DATA — two lessons
   //  Each problem: { prompt, answer, unit?, hint, steps }
   // ============================================================
   const LESSONS = {
-    scale: {
-      key: "scale",
-      emoji: "📐",
-      title: "Scale Factor",
-      blurb: "The one number that turns an original into a scaled copy.",
+    mult: {
+      key: "mult",
+      emoji: "✖️",
+      title: "Multiplication",
+      blurb: "Multi-digit, decimals, and fractions — the same moves, every time.",
       recap: `
-        <p>A <strong>scale factor</strong> is the number every length gets multiplied by to go from the
-        original figure to its scaled copy. It's the single number behind every scaled copy.</p>
-        ${scaleVisual ? `<div class="recap-visual">${scaleVisual}</div>` : ""}
+        <p><strong>Multiplication</strong> is fast repeated adding. An <em>array</em> shows it best:
+        rows of equal groups. The grid below is 4 rows of 6 — count them and you get 24.</p>
+        <div class="recap-visual">${svgArrayModel(4, 6)}</div>
         <div class="recap-rules">
-          <div class="recap-rule"><span class="rr-tag">Find it</span>
-            scale factor = <span class="math">copy length ÷ matching original length</span></div>
-          <div class="recap-rule"><span class="rr-tag">Original → copy</span>
-            <span class="math">multiply</span> the original length by the scale factor</div>
-          <div class="recap-rule"><span class="rr-tag">Copy → original</span>
-            <span class="math">divide</span> the copy length by the scale factor</div>
+          <div class="recap-rule"><span class="rr-tag">Multi-digit</span>
+            break a number into its place values, multiply each part, then <span class="math">add the pieces</span>
+            (e.g. 14 × 5 = 10×5 + 4×5)</div>
+          <div class="recap-rule"><span class="rr-tag">Decimals</span>
+            ignore the points and multiply, then <span class="math">count the decimal places</span> in both
+            factors and give the answer that many</div>
+          <div class="recap-rule"><span class="rr-tag">Fractions</span>
+            multiply <span class="math">top × top</span> and <span class="math">bottom × bottom</span>, then simplify</div>
         </div>
         <div class="recap-eg"><span class="rr-tag">Quick example</span>
-          A side is <strong>4 cm</strong> in the original and <strong>12 cm</strong> in the copy.
-          Scale factor = 12 ÷ 4 = <strong>3</strong>. Bigger than 1 → the copy grew.
-          (Below 1, like ½, means it shrank.)</div>`,
+          <strong>0.6 × 0.4</strong>: first 6 × 4 = 24. The two factors have <strong>2</strong> decimal places
+          in all, so the answer is <strong>0.24</strong>.</div>`,
       warmups: [
-        { prompt: `A side is <strong>4 cm</strong> in the original and <strong>8 cm</strong> in the copy. What is the scale factor?`,
-          answer: 2,
-          hint: `Scale factor = copy ÷ original. Try 8 ÷ 4.`,
-          steps: [`Divide copy ÷ original: 8 ÷ 4.`, `8 ÷ 4 = <strong>2</strong> — every length doubled.`] },
-        { prompt: `The scale factor is <strong>3</strong>. The original side is <strong>5 cm</strong>. How long is the matching side of the copy?`,
-          answer: 15, unit: "cm",
-          hint: `Original → copy means multiply: 5 × 3.`,
-          steps: [`Original × scale factor = copy.`, `5 × 3 = <strong>15 cm</strong>.`] },
-        { prompt: `The scale factor is <strong>4</strong>. A side of the copy is <strong>20 cm</strong>. How long was the original side?`,
-          answer: 5, unit: "cm",
-          hint: `Copy → original means divide: 20 ÷ 4.`,
-          steps: [`Copy ÷ scale factor = original.`, `20 ÷ 4 = <strong>5 cm</strong>.`] },
+        { prompt: `What is <strong>7 × 8</strong>?`,
+          answer: 56,
+          hint: `Seven groups of eight — or just recall the times table.`,
+          steps: [`7 × 8 = <strong>56</strong>.`] },
+        { prompt: `What is <strong>23 × 3</strong>?`,
+          answer: 69,
+          hint: `Split it: 20 × 3 and 3 × 3, then add.`,
+          steps: [`20 × 3 = 60 and 3 × 3 = 9.`, `60 + 9 = <strong>69</strong>.`] },
+        { prompt: `What is <strong>0.2 × 4</strong>?`,
+          answer: 0.8,
+          hint: `Multiply 2 × 4, then place one decimal point.`,
+          steps: [`Ignore the point: 2 × 4 = 8.`, `One decimal place → <strong>0.8</strong>.`] },
       ],
       practice: [
-        { prompt: `The original side is <strong>6 cm</strong> and the copy is <strong>18 cm</strong>. What is the scale factor?`,
-          answer: 3,
-          hint: `Copy ÷ original = 18 ÷ 6.`,
-          steps: [`18 ÷ 6 = <strong>3</strong>.`] },
-        { prompt: `The original side is <strong>10 cm</strong> and the copy is <strong>5 cm</strong>. What is the scale factor?`,
-          answer: 0.5,
-          hint: `Copy ÷ original = 5 ÷ 10. The copy is smaller, so the factor is below 1.`,
-          steps: [`5 ÷ 10 = <strong>0.5</strong> (½). Below 1 means a reduction.`] },
-        { prompt: `Scale factor <strong>2.5</strong>, original side <strong>4 cm</strong>. How long is the copy's side?`,
-          answer: 10, unit: "cm",
-          hint: `Multiply: 4 × 2.5.`,
-          steps: [`4 × 2.5 = <strong>10 cm</strong>.`] },
-        { prompt: `Scale factor <strong>½</strong>, original side <strong>14 cm</strong>. How long is the copy's side?`,
-          answer: 7, unit: "cm",
-          hint: `Multiplying by ½ is the same as halving.`,
-          steps: [`14 × ½ = <strong>7 cm</strong>.`] },
-        { prompt: `Scale factor <strong>3</strong>, a side of the copy is <strong>24 cm</strong>. How long was the original side?`,
-          answer: 8, unit: "cm",
-          hint: `Copy → original means divide: 24 ÷ 3.`,
-          steps: [`24 ÷ 3 = <strong>8 cm</strong>.`] },
-        { prompt: `The original side is <strong>7 cm</strong> and the copy is <strong>21 cm</strong>. What is the scale factor?`,
-          answer: 3,
-          hint: `21 ÷ 7.`,
-          steps: [`21 ÷ 7 = <strong>3</strong>.`] },
-        { prompt: `Scale factor <strong>4</strong>, original side <strong>9 cm</strong>. How long is the copy's side?`,
-          answer: 36, unit: "cm",
-          hint: `Multiply: 9 × 4.`,
-          steps: [`9 × 4 = <strong>36 cm</strong>.`] },
-        { prompt: `The original side is <strong>12 cm</strong> and the copy is <strong>3 cm</strong>. What is the scale factor?`,
-          answer: 0.25,
-          hint: `Copy ÷ original = 3 ÷ 12. The copy shrank a lot.`,
-          steps: [`3 ÷ 12 = <strong>0.25</strong> (¼).`] },
-        { prompt: `Scale factor <strong>6</strong>, a side of the copy is <strong>30 cm</strong>. How long was the original side?`,
-          answer: 5, unit: "cm",
-          hint: `Divide: 30 ÷ 6.`,
-          steps: [`30 ÷ 6 = <strong>5 cm</strong>.`] },
-        { prompt: `Scale factor <strong>1.5</strong>, original side <strong>8 cm</strong>. How long is the copy's side?`,
-          answer: 12, unit: "cm",
-          hint: `8 × 1.5 = 8 + half of 8.`,
-          steps: [`8 × 1.5 = <strong>12 cm</strong>.`] },
+        { prompt: `What is <strong>14 × 5</strong>?`,
+          answer: 70,
+          hint: `10 × 5 and 4 × 5, then add.`,
+          steps: [`10 × 5 = 50 and 4 × 5 = 20.`, `50 + 20 = <strong>70</strong>.`] },
+        { prompt: `What is <strong>26 × 4</strong>?`,
+          answer: 104,
+          hint: `20 × 4 and 6 × 4.`,
+          steps: [`20 × 4 = 80 and 6 × 4 = 24.`, `80 + 24 = <strong>104</strong>.`] },
+        { prompt: `What is <strong>13 × 12</strong>?`,
+          answer: 156,
+          hint: `13 × 10, then 13 × 2.`,
+          steps: [`13 × 10 = 130 and 13 × 2 = 26.`, `130 + 26 = <strong>156</strong>.`] },
+        { prompt: `What is <strong>0.3 × 7</strong>?`,
+          answer: 2.1,
+          hint: `3 × 7 = 21, then one decimal place.`,
+          steps: [`3 × 7 = 21.`, `One decimal place → <strong>2.1</strong>.`] },
+        { prompt: `What is <strong>0.6 × 0.4</strong>?`,
+          answer: 0.24,
+          hint: `6 × 4 = 24, then count the decimal places.`,
+          steps: [`6 × 4 = 24.`, `Two decimal places in all → <strong>0.24</strong>.`] },
+        { prompt: `What is <strong>2.5 × 4</strong>?`,
+          answer: 10,
+          hint: `25 × 4 = 100, then place one decimal point.`,
+          steps: [`25 × 4 = 100.`, `One decimal place → 10.0 = <strong>10</strong>.`] },
+        { prompt: `What is <strong>1.2 × 1.5</strong>?`,
+          answer: 1.8,
+          hint: `12 × 15 = 180, then two decimal places.`,
+          steps: [`12 × 15 = 180.`, `Two decimal places → <strong>1.8</strong>.`] },
+        { prompt: `What is <strong>¾ × 8</strong>?`,
+          answer: 6,
+          hint: `Top × top over bottom: (3 × 8) ÷ 4.`,
+          steps: [`¾ × 8 = (3 × 8)/4 = 24/4.`, `24 ÷ 4 = <strong>6</strong>.`] },
+        { prompt: `What is <strong>⅔ × 9</strong>?`,
+          answer: 6,
+          hint: `(2 × 9) ÷ 3.`,
+          steps: [`⅔ × 9 = 18/3.`, `18 ÷ 3 = <strong>6</strong>.`] },
+        { prompt: `What is <strong>125 × 8</strong>?`,
+          answer: 1000,
+          hint: `A classic: 125 × 8 fills out to a round number.`,
+          steps: [`125 × 8 = <strong>1000</strong>.`] },
       ],
     },
 
-    area: {
-      key: "area",
-      emoji: "🟧",
-      title: "Area Factor",
-      blurb: "When lengths scale by k, area scales by k × k.",
+    div: {
+      key: "div",
+      emoji: "➗",
+      title: "Division",
+      blurb: "Split into equal groups — and flip when you divide by a fraction.",
       recap: `
-        <p>Here's the surprise: when you scale a figure, the <strong>area does not grow by the same
-        number as the sides</strong>. If every length is multiplied by the scale factor, the area is
-        multiplied by the <strong>scale factor squared</strong>.</p>
-        <div class="recap-visual">${svgAreaGrid(3)}</div>
-        <p>Scaling by 3 makes each side 3× longer — but it takes <strong>3 × 3 = 9</strong> of the
-        original squares to fill the copy. That's why the area factor is the square.</p>
+        <p><strong>Division</strong> splits an amount into equal groups, and it always <em>undoes</em>
+        multiplication: 12 ÷ 3 = 4 because 4 × 3 = 12. Here 12 dots share evenly into 3 groups of 4.</p>
+        <div class="recap-visual">${svgGroupsModel(12, 3)}</div>
         <div class="recap-rules">
-          <div class="recap-rule"><span class="rr-tag">Find it</span>
-            area factor = <span class="math">(scale factor)²</span> = scale factor × scale factor</div>
-          <div class="recap-rule"><span class="rr-tag">New area</span>
-            new area = <span class="math">original area × (scale factor)²</span></div>
-          <div class="recap-rule"><span class="rr-tag">Go backwards</span>
-            scale factor = <span class="math">√(area factor)</span></div>
+          <div class="recap-rule"><span class="rr-tag">Whole numbers</span>
+            ask "how many equal groups?" and <span class="math">check by multiplying back</span></div>
+          <div class="recap-rule"><span class="rr-tag">Decimals</span>
+            slide the point in the divisor to make it whole, slide the dividend the <span class="math">same</span>
+            number of places, then divide</div>
+          <div class="recap-rule"><span class="rr-tag">Fractions</span>
+            <span class="math">keep · change · flip</span> — keep the first, change ÷ to ×, flip the second</div>
         </div>
         <div class="recap-eg"><span class="rr-tag">Quick example</span>
-          Scale factor <strong>2</strong> → area factor = 2 × 2 = <strong>4</strong>.
-          So a 5 cm² shape becomes 5 × 4 = <strong>20 cm²</strong>. Double the sides, quadruple the area.</div>`,
+          <strong>¾ ÷ ⅛</strong>: keep ¾, change to ×, flip ⅛ → 8. So ¾ × 8 = <strong>6</strong>.</div>`,
       warmups: [
-        { prompt: `The scale factor is <strong>2</strong>. What is the area factor (how many times bigger the area gets)?`,
+        { prompt: `What is <strong>24 ÷ 6</strong>?`,
           answer: 4,
-          hint: `Area factor = scale factor × scale factor = 2 × 2.`,
-          steps: [`2 × 2 = <strong>4</strong>. Double the sides → 4× the area.`] },
-        { prompt: `The scale factor is <strong>3</strong>. What is the area factor?`,
-          answer: 9,
-          hint: `3 × 3.`,
-          steps: [`3 × 3 = <strong>9</strong>.`] },
-        { prompt: `The scale factor is <strong>5</strong>. What is the area factor?`,
-          answer: 25,
-          hint: `5 × 5.`,
-          steps: [`5 × 5 = <strong>25</strong>.`] },
+          hint: `What number times 6 makes 24?`,
+          steps: [`6 × 4 = 24, so 24 ÷ 6 = <strong>4</strong>.`] },
+        { prompt: `What is <strong>56 ÷ 7</strong>?`,
+          answer: 8,
+          hint: `What number times 7 makes 56?`,
+          steps: [`7 × 8 = 56, so 56 ÷ 7 = <strong>8</strong>.`] },
+        { prompt: `What is <strong>4.8 ÷ 2</strong>?`,
+          answer: 2.4,
+          hint: `Halve it. 48 ÷ 2 = 24, then place the point.`,
+          steps: [`48 ÷ 2 = 24.`, `Keep one decimal place → <strong>2.4</strong>.`] },
       ],
       practice: [
-        { prompt: `The scale factor is <strong>4</strong>. What is the area factor?`,
-          answer: 16,
-          hint: `4 × 4.`,
-          steps: [`4 × 4 = <strong>16</strong>.`] },
-        { prompt: `The scale factor is <strong>½</strong>. What is the area factor?`,
-          answer: 0.25,
-          hint: `½ × ½. The area shrinks even more than the sides do.`,
-          steps: [`½ × ½ = <strong>¼ (0.25)</strong>. Half the sides → a quarter of the area.`] },
-        { prompt: `A shape has area <strong>5 cm²</strong>. It's scaled by a factor of <strong>2</strong>. What is the new area?`,
-          answer: 20, unit: "cm²",
-          hint: `New area = original × (scale factor)² = 5 × (2 × 2).`,
-          steps: [`Area factor = 2 × 2 = 4.`, `5 × 4 = <strong>20 cm²</strong>.`] },
-        { prompt: `A shape has area <strong>6 cm²</strong>. It's scaled by a factor of <strong>3</strong>. What is the new area?`,
-          answer: 54, unit: "cm²",
-          hint: `Area factor = 3 × 3 = 9, then multiply.`,
-          steps: [`Area factor = 3 × 3 = 9.`, `6 × 9 = <strong>54 cm²</strong>.`] },
-        { prompt: `A scaled copy has <strong>9 times</strong> the area of the original. What was the scale factor?`,
-          answer: 3,
-          hint: `Scale factor = √(area factor) = √9.`,
-          steps: [`√9 = <strong>3</strong>, because 3 × 3 = 9.`] },
-        { prompt: `A scaled copy has <strong>16 times</strong> the area of the original. What was the scale factor?`,
-          answer: 4,
-          hint: `√16.`,
-          steps: [`√16 = <strong>4</strong>, because 4 × 4 = 16.`] },
-        { prompt: `The scale factor is <strong>10</strong>. What is the area factor?`,
-          answer: 100,
-          hint: `10 × 10.`,
-          steps: [`10 × 10 = <strong>100</strong>.`] },
-        { prompt: `A shape has area <strong>8 cm²</strong>. It's scaled by a factor of <strong>½</strong>. What is the new area?`,
-          answer: 2, unit: "cm²",
-          hint: `Area factor = ½ × ½ = ¼. Then 8 × ¼.`,
-          steps: [`Area factor = ½ × ½ = ¼.`, `8 × ¼ = <strong>2 cm²</strong>.`] },
-        { prompt: `A drawing is enlarged by a scale factor of <strong>6</strong>. The area is multiplied by what number?`,
-          answer: 36,
-          hint: `6 × 6.`,
-          steps: [`6 × 6 = <strong>36</strong>.`] },
-        { prompt: `A scaled copy has <strong>25 times</strong> the area of the original. What was the scale factor?`,
-          answer: 5,
-          hint: `√25.`,
-          steps: [`√25 = <strong>5</strong>, because 5 × 5 = 25.`] },
+        { prompt: `What is <strong>72 ÷ 8</strong>?`,
+          answer: 9,
+          hint: `8 × ? = 72.`,
+          steps: [`8 × 9 = 72, so <strong>9</strong>.`] },
+        { prompt: `What is <strong>84 ÷ 6</strong>?`,
+          answer: 14,
+          hint: `60 ÷ 6 and 24 ÷ 6.`,
+          steps: [`60 ÷ 6 = 10 and 24 ÷ 6 = 4.`, `10 + 4 = <strong>14</strong>.`] },
+        { prompt: `What is <strong>96 ÷ 4</strong>?`,
+          answer: 24,
+          hint: `80 ÷ 4 and 16 ÷ 4.`,
+          steps: [`80 ÷ 4 = 20 and 16 ÷ 4 = 4.`, `20 + 4 = <strong>24</strong>.`] },
+        { prompt: `What is <strong>144 ÷ 12</strong>?`,
+          answer: 12,
+          hint: `12 × ? = 144.`,
+          steps: [`12 × 12 = 144, so <strong>12</strong>.`] },
+        { prompt: `What is <strong>6.5 ÷ 5</strong>?`,
+          answer: 1.3,
+          hint: `65 ÷ 5 = 13, then place the point.`,
+          steps: [`65 ÷ 5 = 13.`, `Keep one decimal place → <strong>1.3</strong>.`] },
+        { prompt: `What is <strong>9.6 ÷ 3</strong>?`,
+          answer: 3.2,
+          hint: `96 ÷ 3 = 32, then place the point.`,
+          steps: [`96 ÷ 3 = 32.`, `One decimal place → <strong>3.2</strong>.`] },
+        { prompt: `What is <strong>7.2 ÷ 0.8</strong>?`,
+          answer: 9,
+          hint: `Slide both points one place: 72 ÷ 8.`,
+          steps: [`Make the divisor whole: 7.2 ÷ 0.8 = 72 ÷ 8.`, `72 ÷ 8 = <strong>9</strong>.`] },
+        { prompt: `What is <strong>½ ÷ ¼</strong>?`,
+          answer: 2,
+          hint: `Keep · change · flip: ½ × 4.`,
+          steps: [`½ ÷ ¼ = ½ × 4/1 = 4/2.`, `4 ÷ 2 = <strong>2</strong>.`] },
+        { prompt: `What is <strong>¾ ÷ ⅛</strong>?`,
+          answer: 6,
+          hint: `Keep ¾, flip ⅛ to 8, then multiply.`,
+          steps: [`¾ ÷ ⅛ = ¾ × 8 = 24/4.`, `24 ÷ 4 = <strong>6</strong>.`] },
+        { prompt: `What is <strong>100 ÷ 8</strong>?`,
+          answer: 12.5,
+          hint: `8 × 12 = 96, with 4 left over → a half.`,
+          steps: [`8 × 12 = 96, remainder 4.`, `4 ÷ 8 = 0.5, so <strong>12.5</strong>.`] },
       ],
     },
   };
@@ -234,7 +255,7 @@
         <button class="review-card ${complete ? "is-complete" : ""}" data-review="${l.key}">
           <span class="rc-emoji">${l.emoji}</span>
           <span class="rc-body">
-            <span class="rc-kicker">Lesson ${l.key === "scale" ? "1" : "2"}${complete ? " • done 🌸" : ""}</span>
+            <span class="rc-kicker">Lesson ${LNUM[l.key]}${complete ? " • done 🌸" : ""}</span>
             <h3>${l.title}</h3>
             <p>${l.blurb}</p>
             <span class="rc-bar"><span class="rc-bar-fill" style="width:${pct}%"></span></span>
@@ -250,8 +271,8 @@
           <p>Two quick refreshers. Read the recap, ease in with the warm-ups, then grow through the practice. No rush. 🌱</p>
         </div>
         <div class="review-cards">
-          ${card(LESSONS.scale)}
-          ${card(LESSONS.area)}
+          ${card(LESSONS.mult)}
+          ${card(LESSONS.div)}
         </div>
       </section>`;
   }
@@ -311,7 +332,7 @@
       <nav class="crumbs rise"><a href="#" data-home>← My garden</a> <span>/ Before next session</span> <span>/ ${l.title}</span></nav>
 
       <header class="review-hero rise d1">
-        <span class="hero-kicker">Lesson ${key === "scale" ? "1" : "2"} • before next session</span>
+        <span class="hero-kicker">Lesson ${LNUM[key]} • before next session</span>
         <h1>${l.emoji} ${l.title}</h1>
         <p class="lede">${l.blurb}</p>
         <div class="review-progress">
