@@ -89,22 +89,44 @@
       title: "Multiplication",
       blurb: "Multi-digit, decimals, and fractions — the same moves, every time.",
       recap: `
-        <p><strong>Multiplication</strong> is fast repeated adding. An <em>array</em> shows it best:
-        rows of equal groups. The grid below is 4 rows of 6 — count them and you get 24.</p>
+        <p><strong>Multiplication</strong> is fast repeated adding — equal groups joined together. The
+        array below is 4 rows of 6, the same as 6 + 6 + 6 + 6 = <strong>24</strong>.</p>
         <div class="recap-visual">${svgArrayModel(4, 6)}</div>
-        <div class="recap-rules">
-          <div class="recap-rule"><span class="rr-tag">Multi-digit</span>
-            break a number into its place values, multiply each part, then <span class="math">add the pieces</span>
-            (e.g. 14 × 5 = 10×5 + 4×5)</div>
-          <div class="recap-rule"><span class="rr-tag">Decimals</span>
-            ignore the points and multiply, then <span class="math">count the decimal places</span> in both
-            factors and give the answer that many</div>
-          <div class="recap-rule"><span class="rr-tag">Fractions</span>
-            multiply <span class="math">top × top</span> and <span class="math">bottom × bottom</span>, then simplify</div>
+        <p>For bigger whole numbers, split each one into its place values, multiply the parts, and add them:
+        <span class="math">14 × 5 = (10 × 5) + (4 × 5) = 50 + 20 = 70</span>. The two cases people forget are
+        decimals and fractions — so here they are, step by step.</p>
+
+        <h3 class="recap-sub">🔢 Multiplying with decimals</h3>
+        <p>The trick: multiply as if the points weren't there, then put the point back at the very end.</p>
+        <div class="recap-walk">
+          <span class="rw-head">Three steps</span>
+          <ol>
+            <li>Ignore the decimal points and multiply the numbers like ordinary whole numbers.</li>
+            <li>Count how many digits sit <strong>after</strong> a point — in <strong>both</strong> numbers, added together.</li>
+            <li>Put that many decimal places in your answer, counting from the right.</li>
+          </ol>
         </div>
-        <div class="recap-eg"><span class="rr-tag">Quick example</span>
-          <strong>0.6 × 0.4</strong>: first 6 × 4 = 24. The two factors have <strong>2</strong> decimal places
-          in all, so the answer is <strong>0.24</strong>.</div>`,
+        <div class="recap-eg"><span class="rr-tag">Worked example — 0.6 × 0.4</span>
+          <strong>Step 1:</strong> 6 × 4 = 24. <strong>Step 2:</strong> 0.6 has 1 digit after the point and
+          0.4 has 1, so 2 in all. <strong>Step 3:</strong> count 2 places from the right of 24 →
+          <strong>0.24</strong>.</div>
+        <p class="recap-tip">Sense check: multiplying by a number <em>less than 1</em> makes the result
+        smaller than what you started with. 0.4 is less than 1, and sure enough 0.24 is smaller than 0.6. ✓</p>
+
+        <h3 class="recap-sub">🍰 Multiplying with fractions</h3>
+        <p>Fractions are friendlier than they look here — no common denominator needed. Just go straight across.</p>
+        <div class="recap-walk">
+          <span class="rw-head">Two steps</span>
+          <ol>
+            <li>Multiply the <strong>tops</strong> (the numerators) to get the new top.</li>
+            <li>Multiply the <strong>bottoms</strong> (the denominators) to get the new bottom — then simplify.</li>
+          </ol>
+        </div>
+        <p>A whole number is just a fraction over 1, so <span class="math">8 = 8/1</span>. And the word
+        <strong>“of”</strong> means multiply — <em>½ of 8</em> is <span class="math">½ × 8 = 4</span>.</p>
+        <div class="recap-eg"><span class="rr-tag">Worked example — ¾ × 8</span>
+          Write 8 as 8/1. <strong>Tops:</strong> 3 × 8 = 24. <strong>Bottoms:</strong> 4 × 1 = 4.
+          That gives 24/4, and 24 ÷ 4 = <strong>6</strong>.</div>`,
       warmups: [
         { prompt: `What is <strong>7 × 8</strong>?`,
           answer: 56,
@@ -170,19 +192,45 @@
       blurb: "Split into equal groups — and flip when you divide by a fraction.",
       recap: `
         <p><strong>Division</strong> splits an amount into equal groups, and it always <em>undoes</em>
-        multiplication: 12 ÷ 3 = 4 because 4 × 3 = 12. Here 12 dots share evenly into 3 groups of 4.</p>
+        multiplication: 12 ÷ 3 = 4 because 4 × 3 = 12. Below, 12 dots share evenly into 3 groups of 4.</p>
         <div class="recap-visual">${svgGroupsModel(12, 3)}</div>
-        <div class="recap-rules">
-          <div class="recap-rule"><span class="rr-tag">Whole numbers</span>
-            ask "how many equal groups?" and <span class="math">check by multiplying back</span></div>
-          <div class="recap-rule"><span class="rr-tag">Decimals</span>
-            slide the point in the divisor to make it whole, slide the dividend the <span class="math">same</span>
-            number of places, then divide</div>
-          <div class="recap-rule"><span class="rr-tag">Fractions</span>
-            <span class="math">keep · change · flip</span> — keep the first, change ÷ to ×, flip the second</div>
+        <p>The number being split (12) is the <strong>dividend</strong>; the number you divide by (3) is the
+        <strong>divisor</strong>. Two cases trip people up — decimals and fractions — so here they are in full.</p>
+
+        <h3 class="recap-sub">🔢 Dividing with decimals</h3>
+        <p>If only the number being split has a decimal, just divide and keep the point lined up:
+        <span class="math">4.8 ÷ 2 = 2.4</span>. The tricky case is dividing <strong>by</strong> a decimal — fix
+        it by turning the divisor into a whole number first.</p>
+        <div class="recap-walk">
+          <span class="rw-head">Three steps</span>
+          <ol>
+            <li>Slide the divisor's point to the right until it's a whole number — count how many places.</li>
+            <li>Slide the dividend's point to the right the <strong>same</strong> number of places.</li>
+            <li>Divide. The answer is unchanged, because you scaled both numbers the same way.</li>
+          </ol>
         </div>
-        <div class="recap-eg"><span class="rr-tag">Quick example</span>
-          <strong>¾ ÷ ⅛</strong>: keep ¾, change to ×, flip ⅛ → 8. So ¾ × 8 = <strong>6</strong>.</div>`,
+        <div class="recap-eg"><span class="rr-tag">Worked example — 7.2 ÷ 0.8</span>
+          The divisor 0.8 needs <strong>1</strong> slide to become 8. Slide 7.2 once too → 72.
+          Now <span class="math">72 ÷ 8 = 9</span>.</div>
+        <p class="recap-tip">Sense check: dividing by a number <em>less than 1</em> makes the answer
+        bigger. 7.2 ÷ 0.8 = 9, which is larger than 7.2. ✓</p>
+
+        <h3 class="recap-sub">🍰 Dividing by a fraction — “keep · change · flip”</h3>
+        <p>You can't divide by a fraction directly, so you multiply by its <strong>reciprocal</strong> (its flip).
+        Picture it: dividing by ½ asks “how many halves fit?” Halves are small, so lots of them fit — that's
+        why the answer gets bigger, not smaller.</p>
+        <div class="recap-walk">
+          <span class="rw-head">Keep · change · flip</span>
+          <ol>
+            <li><strong>Keep</strong> the first fraction exactly as it is.</li>
+            <li><strong>Change</strong> the ÷ sign into a × sign.</li>
+            <li><strong>Flip</strong> the second fraction upside down — then multiply tops and bottoms.</li>
+          </ol>
+        </div>
+        <p>A whole number flips too — <span class="math">8 = 8/1</span> flips to <span class="math">1/8</span>.</p>
+        <div class="recap-eg"><span class="rr-tag">Worked example — ¾ ÷ ⅛</span>
+          Keep ¾. Change ÷ to ×. Flip ⅛ → 8/1. Now ¾ × 8 = 24/4 = <strong>6</strong>.
+          (It checks out: ¾ is the same as 6 eighths, so exactly 6 eighths fit.)</div>`,
       warmups: [
         { prompt: `What is <strong>24 ÷ 6</strong>?`,
           answer: 4,
