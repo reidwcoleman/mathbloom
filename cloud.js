@@ -9,13 +9,12 @@
    Data lives at  mathbloom_gardens/{code}  and holds BOTH the lesson
    garden (progress) and the "before next session" recap progress.
 
-   ⚠️ One-time setup: the shared RTDB rules must allow this path. In the
-   Firebase console (famsync-62653 → Realtime Database → Rules), add:
-       "mathbloom_gardens": {
-         "$code": { ".read": "auth != null", ".write": "auth != null" }
-       }
-   Until that rule is added, cloud writes are denied and MathBloom simply
-   stays local (everything still saves on the device).
+   RTDB rule (DEPLOYED 2026-06-22): mathbloom_gardens/$code allows
+   read+write for authenticated (anonymous) users, living alongside
+   cham_rooms (Hue & Seek). If cloud writes ever fail with "permission
+   denied," confirm that rule still exists in
+   famsync-62653 → Realtime Database → Rules. If the cloud is unreachable
+   for any reason, MathBloom just stays local — nothing is lost.
    ============================================================ */
 
 const CLOUD_PATH = "mathbloom_gardens";
