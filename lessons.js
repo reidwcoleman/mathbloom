@@ -1244,50 +1244,185 @@ const UNITS = [
         blurb: "Spot the one number hiding in every proportional table.",
         pages: [
           {
-            title: "The hidden multiplier",
+            title: "Two things growing together",
             html: `
-              <p>Two quantities are in a <strong>proportional relationship</strong> when one is always the <em>same multiple</em> of the other. That multiple is the <strong>constant of proportionality</strong> — we call it <span class="math">k</span>.</p>
-              <div class="teach-visual">${htmlTable([2, 4, 5], [6, 12, 15], -1, "bananas", "strawberries")}</div>
-              <p>Check each row: 6 ÷ 2 = 3, &nbsp;12 ÷ 4 = 3, &nbsp;15 ÷ 5 = 3. Same answer every time — every banana brings exactly 3 strawberries along.</p>
+              <p>Picture a juice bar where smoothies are <strong>$3 each</strong>. Buy more, pay more — and you can see it line up in a table:</p>
+              <div class="teach-visual">${htmlTable([1, 2, 3, 4], [3, 6, 9, 12], -1, "smoothies", "cost ($)")}</div>
+              <p>Notice the rhythm: every extra smoothie adds the <strong>same $3</strong>. The cost and the number of smoothies climb together at a steady rate.</p>
               <div class="key-idea"><span class="tag">Key idea</span>
-                In every row: <span class="math">k = y ÷ x</span> — and it's the <em>same k every time</em>.
+                When two amounts always grow together at a steady rate like this, they're in a <strong>proportional relationship</strong>.
               </div>`
           },
           {
-            title: "The one-row trick & the every-row test",
+            title: "Meet k — the steady multiplier",
             html: `
-              <p>Two superpowers come from this:</p>
-              <ul>
-                <li><strong>Finding k:</strong> pick <em>any one row</em> (the friendliest numbers!) and divide y ÷ x.</li>
-                <li><strong>Testing proportionality:</strong> check <em>every row</em>. If even one row gives a different quotient, it's <strong>not</strong> proportional.</li>
-              </ul>
-              <div class="example"><span class="tag">Worked example — filling a gap</span>
-                <p>A proportional table shows x = 3 → y = 12, and x = 7 → y = ?</p>
-                <p><strong>Step 1.</strong> Find k from the complete row: k = 12 ÷ 3 = 4.</p>
-                <p><strong>Step 2.</strong> Use it: y = 7 × 4 = <strong>28</strong>.</p>
+              <p>One number runs this whole table. To get the cost, you <strong>multiply the number of smoothies by 3</strong> — every single time:</p>
+              <div class="teach-visual">${htmlTable([1, 2, 3, 4], [3, 6, 9, 12], -1, "smoothies", "cost ($)")}</div>
+              <p>1 × 3 = 3,&nbsp; 2 × 3 = 6,&nbsp; 3 × 3 = 9… That steady “× 3” has a name: the <strong>constant of proportionality</strong>. Math gives it a short nickname, <span class="math">k</span>.</p>
+              <div class="key-idea"><span class="tag">Meet k</span>
+                <span class="math">k</span> is the number you multiply <span class="math">x</span> by to get <span class="math">y</span>. For the smoothies, <span class="math">k = 3</span>.
+              </div>`
+          },
+          {
+            title: "Finding k: just divide",
+            html: `
+              <p>What if nobody hands you k? Work backwards. Since you <em>multiply</em> x by k to get y, you can <strong>divide y by x</strong> to get k back:</p>
+              <div class="key-idea"><span class="tag">The move</span>
+                <span class="math">k = y ÷ x</span> — and you can use <em>any row you like</em>, so grab the friendliest numbers.
+              </div>
+              <p>Here's a car driving a steady speed — miles vs. hours:</p>
+              <div class="teach-visual">${htmlTable([2, 4, 6], [10, 20, 30], -1, "hours", "miles")}</div>
+              <div class="example"><span class="tag">Worked example</span>
+                <p>Pick the first row: <span class="math">k = 10 ÷ 2 = 5</span>. The car goes 5 miles every hour.</p>
+                <p>Double-check another row: 20 ÷ 4 = 5. Same answer. ✓</p>
               </div>`,
             checkpoint: {
-              q: "A table shows x = 2 → y = 10 and x = 6 → y = 30. Is it proportional so far?",
-              options: ["Yes — both rows give k = 5", "No — the y values are different", "Can't tell without a graph"],
+              q: "Movie tickets cost the same each: 4 tickets are $20 and 6 tickets are $30. What is k?",
+              options: ["k = 5 (dollars per ticket)", "k = 16", "k = 120"],
               correct: 0,
-              why: "10 ÷ 2 = 5 and 30 ÷ 6 = 5. Same quotient → proportional so far. The y values being different is totally fine — it's the *ratio* that has to stay the same."
+              why: "k = y ÷ x = 20 ÷ 4 = 5, and 30 ÷ 6 = 5 too. Each ticket is $5 — that's k. (Subtracting 20 − 4 = 16 isn't how k works.)"
             }
           },
           {
-            title: "What k actually means",
+            title: "k is a “per one” number",
             html: `
-              <p>k isn't just a number to compute — it always <em>means</em> something in the story:</p>
+              <p>Here's what makes k so handy: it always <em>means</em> something real. k is the amount of y you get for <strong>just one</strong> x:</p>
               <ul>
-                <li>Cost vs. pounds → k is the <strong>price per pound</strong>.</li>
-                <li>Pages vs. minutes → k is the <strong>reading speed</strong>.</li>
-                <li>Strawberries vs. bananas → k is <strong>strawberries per banana</strong>.</li>
+                <li>Cost vs. pounds of apples → k is the <strong>price per pound</strong>.</li>
+                <li>Miles vs. hours → k is the <strong>speed</strong> (miles per hour).</li>
+                <li>Cost vs. smoothies → k is the <strong>price of one smoothie</strong>.</li>
               </ul>
-              <div class="key-idea"><span class="tag">Friendly translation</span>
-                k = "how much y you get for <em>one</em> x." It's the per-one number.
+              <div class="teach-visual">${htmlTable([1, 2, 3], [3, 6, 9], -1, "smoothies", "cost ($)")}</div>
+              <div class="key-idea"><span class="tag">Say it out loud</span>
+                k = “how much y for <strong>one</strong> x.” When a problem feels foggy, find k and say it as a “per” sentence. 🌤️
+              </div>`
+          },
+          {
+            title: "The missing-number trick",
+            html: `
+              <p>Once you know k, you can fill in <em>any</em> gap in a table. The recipe is short: <strong>find k, then multiply</strong>.</p>
+              <p>A garden hose fills a pool at a steady rate. How many gallons after 8 minutes?</p>
+              <div class="teach-visual">${htmlTable([3, 5, 8], [12, 20, 32], 2, "minutes", "gallons")}</div>
+              <div class="example"><span class="tag">Worked example</span>
+                <p><strong>Step 1.</strong> Find k from a full row: <span class="math">12 ÷ 3 = 4</span> (4 gallons each minute).</p>
+                <p><strong>Step 2.</strong> Fill the gap: <span class="math">8 × 4 = 32</span>. The “?” is <strong>32 gallons</strong>.</p>
+              </div>`,
+            checkpoint: {
+              q: "Markers cost a steady price: 2 markers = $6. At that rate, what do 5 markers cost?",
+              options: ["$15", "$11", "$30"],
+              correct: 0,
+              why: "First find k: 6 ÷ 2 = 3 (each marker is $3). Then 5 × 3 = $15. (Adding 6 + 5 = 11 forgets the steady rate.)"
+            }
+          },
+          {
+            title: "Is it really proportional? The every-row test",
+            html: `
+              <p>Careful — not every table is proportional. To be sure, check <strong>every</strong> row: they all have to give the <em>same</em> k. One oddball row and the deal is off.</p>
+              <div class="teach-visual">${htmlTable([2, 4, 6], [10, 20, 28], -1, "hours", "miles")}</div>
+              <p>Row by row: 10 ÷ 2 = 5,&nbsp; 20 ÷ 4 = 5,&nbsp; but 28 ÷ 6 ≈ 4.7. That last row breaks the pattern — so this table is <strong>not</strong> proportional.</p>
+              <div class="key-idea"><span class="tag">The test</span>
+                Same k in every row → proportional. Even one different row → not proportional.
               </div>
-              <p>When a problem feels confusing, find k and say it out loud as a "per" sentence. The fog usually clears. 🌤️</p>`
+              <p>You can now find k, read what it means, fill gaps, and test a table. Let's do a few together. 🌱</p>`
           }
         ],
+        guided: {
+          intro: `You can now <strong>find</strong> k, <strong>use</strong> it, and <strong>test</strong> for it. Let's walk through one of each — one little step at a time.`,
+          problems: [
+            {
+              title: "Find k from a table",
+              context: `<p>A farm stand sells apples by the pound. Here's the cost.</p>`,
+              visual: htmlTable([2, 4, 5], [6, 12, 15], -1, "pounds", "cost ($)"),
+              steps: [
+                {
+                  prompt: `To find k, what do we do with a row's two numbers?`,
+                  type: "choice",
+                  choices: ["Add them", "Divide cost ÷ pounds", "Subtract them"],
+                  answer: 1,
+                  hint: `k = y ÷ x — here that's cost ÷ pounds.`,
+                  teach: `Dividing cost ÷ pounds tells you the price of <em>one</em> pound — and that price is k.`
+                },
+                {
+                  prompt: `Use the first row: 6 ÷ 2 = ?`,
+                  type: "numeric", answer: 3, unit: "$/lb",
+                  hint: `How many 2's fit into 6?`,
+                  teach: `6 ÷ 2 = <strong>3</strong>. Apples are $3 per pound, so k = 3.`
+                },
+                {
+                  prompt: `Check the next row: 12 ÷ 4 is also 3. Same number — so this table is…`,
+                  type: "choice",
+                  choices: ["proportional", "not proportional"],
+                  answer: 0,
+                  teach: `Every row gives 3, so it passes the every-row test. ✓`
+                }
+              ],
+              recap: `<p>k = cost ÷ pounds = <strong>3</strong> ($3 per pound), confirmed in every row.</p>`
+            },
+            {
+              title: "Fill in the missing value",
+              context: `<p>A garden hose fills a pool at a steady rate. How full is it after 8 minutes?</p>`,
+              visual: htmlTable([3, 5, 8], [12, 20, 32], 2, "minutes", "gallons"),
+              steps: [
+                {
+                  prompt: `Find k from a full row: 12 ÷ 3 = ?`,
+                  type: "numeric", answer: 4, unit: "gal/min",
+                  hint: `Use a row where both numbers are shown.`,
+                  teach: `12 ÷ 3 = <strong>4</strong>. The hose adds 4 gallons each minute — k = 4.`
+                },
+                {
+                  prompt: `Now fill the gap. After 8 minutes: 8 × 4 = ?`,
+                  type: "numeric", answer: 32, unit: "gal",
+                  hint: `Multiply the minutes by k.`,
+                  teach: `8 × 4 = <strong>32 gallons</strong>. Find k, then multiply — that fills any gap.`
+                }
+              ],
+              recap: `<p>k = 4 gal/min, so 8 × 4 = <strong>32 gallons</strong>.</p>`
+            },
+            {
+              title: "What does k mean — and use it",
+              context: `<p>Maria reads at a steady speed: <strong>90 words in 3 minutes</strong>.</p>`,
+              steps: [
+                {
+                  prompt: `What is k here, in words per minute? 90 ÷ 3 = ?`,
+                  type: "numeric", answer: 30, unit: "words/min",
+                  hint: `k = y ÷ x = words ÷ minutes.`,
+                  teach: `90 ÷ 3 = <strong>30</strong>. Maria reads 30 words per minute — k is a “per one” number.`
+                },
+                {
+                  prompt: `At that rate, how many words in 10 minutes? 30 × 10 = ?`,
+                  type: "numeric", answer: 300, unit: "words",
+                  teach: `30 × 10 = <strong>300 words</strong>. Once you know the per-minute rate, multiply to jump ahead.`
+                }
+              ],
+              recap: `<p>k = 30 words/min, so in 10 minutes she reads 30 × 10 = <strong>300 words</strong>.</p>`
+            },
+            {
+              title: "Proportional, or not?",
+              context: `<p>Is this table proportional? Check it the careful way — every row.</p>`,
+              visual: htmlTable([1, 2, 3], [4, 8, 15], -1, "x", "y"),
+              steps: [
+                {
+                  prompt: `Row 1: 4 ÷ 1 = ?`,
+                  type: "numeric", answer: 4,
+                  teach: `Row 1 gives k = <strong>4</strong>.`
+                },
+                {
+                  prompt: `Row 3: 15 ÷ 3 = ?`,
+                  type: "numeric", answer: 5,
+                  teach: `Row 3 gives <strong>5</strong> — a different number!`
+                },
+                {
+                  prompt: `The rows gave 4, 4, then 5. So the table is…`,
+                  type: "choice",
+                  choices: ["proportional", "not proportional"],
+                  answer: 1,
+                  teach: `One row broke the pattern, so it's <strong>not proportional</strong>. Every row has to match.`
+                }
+              ],
+              recap: `<p>Rows gave 4, 4, 5 — not all equal, so <strong>not proportional</strong>.</p>`
+            }
+          ]
+        },
         generate() {
           const v = ri(1, 4);
           const makeXs = () => {
@@ -1393,29 +1528,51 @@ const UNITS = [
         blurb: "One tiny equation that describes the whole relationship.",
         pages: [
           {
-            title: "From table to equation",
+            title: "One rule for the whole table",
             html: `
-              <p>Once you know <span class="math">k</span>, you can capture the <em>entire</em> relationship — every possible pair of values, forever — in one tiny equation:</p>
+              <p>Last lesson you found k. Now watch k do something powerful: it lets you write the <em>whole</em> relationship as one short equation.</p>
+              <p>A food truck sells tacos for <strong>$4 each</strong>:</p>
+              <div class="teach-visual">${htmlTable([1, 2, 3], [4, 8, 12], -1, "tacos", "cost ($)")}</div>
+              <p>Instead of writing out every row forever, we just say: cost = 4 × tacos. Using <span class="math">y</span> for cost and <span class="math">x</span> for tacos:</p>
               <div class="key-idea"><span class="tag">Key idea</span>
-                <span class="math">y = kx</span> &nbsp;— "to get y, multiply x by k."
-              </div>
-              <div class="example"><span class="tag">Example</span>
-                <p>A food truck sells tacos for $4 each. Let x = tacos, y = total cost.</p>
-                <p>Equation: <span class="math">y = 4x</span>. Done. That one line knows the price of 1 taco, 7 tacos, 100 tacos…</p>
+                <span class="math">y = 4x</span> — that one line already knows the price of 1 taco, 7 tacos, even 100 tacos.
               </div>`
           },
           {
-            title: "Forward and backward",
+            title: "What y = kx is really saying",
             html: `
-              <p>The equation works in both directions:</p>
-              <div class="example"><span class="tag">Forward — know x, want y</span>
-                <p>y = 4x, and you buy 7 tacos: y = 4 × 7 = <strong>$28</strong>. Just multiply.</p>
+              <p>Every proportional relationship fits the same template: <span class="math">y = kx</span>. Here's each part in plain English:</p>
+              <ul>
+                <li><span class="math">y</span> — the amount you want to find (the cost).</li>
+                <li><span class="math">k</span> — the steady multiplier from last lesson (the price of one).</li>
+                <li><span class="math">x</span> — how many you have (the tacos).</li>
+              </ul>
+              <div class="teach-visual">${htmlTable([1, 2, 3], [4, 8, 12], -1, "tacos (x)", "cost (y)")}</div>
+              <div class="key-idea"><span class="tag">Read it like a sentence</span>
+                <span class="math">y = kx</span> means “to get y, multiply x by k.” The whole relationship, in three letters.
+              </div>`
+          },
+          {
+            title: "Forward: know x, find y",
+            html: `
+              <p>The equation is a two-way street. Going <strong>forward</strong> means you know x and want y — so you <strong>multiply</strong>.</p>
+              <div class="teach-visual">${htmlTable([1, 2, 7], [4, 8, 28], 2, "tacos", "cost ($)")}</div>
+              <div class="example"><span class="tag">Forward example</span>
+                <p>You buy 7 tacos with <span class="math">y = 4x</span>. Just plug in: <span class="math">y = 4 × 7 = 28</span> → <strong>$28</strong>.</p>
               </div>
-              <div class="example"><span class="tag">Backward — know y, want x</span>
-                <p>y = 4x, and you spent $36: 36 = 4x → x = 36 ÷ 4 = <strong>9 tacos</strong>. Just divide.</p>
+              <div class="key-idea"><span class="tag">Forward = multiply</span>
+                Know how many (x)? Multiply by k to get the total (y).
+              </div>`
+          },
+          {
+            title: "Backward: know y, find x",
+            html: `
+              <p>Going <strong>backward</strong> is the flip side: you know y and want x — so you <strong>divide</strong>.</p>
+              <div class="example"><span class="tag">Backward example</span>
+                <p>You spent <strong>$36</strong> on tacos with <span class="math">y = 4x</span>. So <span class="math">36 = 4x</span>. Divide both sides by 4: <span class="math">x = 36 ÷ 4 = 9 tacos</span>.</p>
               </div>
               <div class="key-idea"><span class="tag">Memory hook</span>
-                Forward questions <strong>multiply</strong>. Backward questions <strong>divide</strong>.
+                Forward questions <strong>multiply</strong>. Backward questions <strong>divide</strong>. Same equation, opposite moves.
               </div>`,
             checkpoint: {
               q: "Ari bikes 12 miles every hour, so y = 12x (x hours, y miles). How long does a 36-mile ride take?",
@@ -1425,20 +1582,121 @@ const UNITS = [
             }
           },
           {
-            title: "Spotting the right equation",
+            title: "Spotting a proportional equation",
             html: `
-              <p>On tests, you'll often pick the equation from a lineup. Here's how to spot the real one:</p>
+              <p>Sometimes you have to pick the proportional equation out of a lineup. The real ones always look the same:</p>
               <ul>
-                <li>Proportional equations are <em>always</em> <span class="math">y = (number) × x</span>. Nothing added, nothing subtracted.</li>
-                <li><span class="math">y = x + 4</span>? That's adding — not proportional.</li>
-                <li><span class="math">y = x ÷ 4</span>? Sneaky! That IS proportional — it's the same as y = ¼x. The k is just a fraction.</li>
+                <li>Proportional: <span class="math">y = (some number) × x</span> — a clean multiply, nothing added on.</li>
+                <li><span class="math">y = x + 4</span>? That <em>adds</em> 4 — not proportional.</li>
+                <li><span class="math">y = 2x − 1</span>? That subtracts — not proportional.</li>
               </ul>
-              <div class="key-idea"><span class="tag">The test</span>
-                Plug in x = 0. A proportional equation must give y = 0. Zero tacos, zero dollars.
+              <div class="key-idea"><span class="tag">The zero test</span>
+                Plug in x = 0. A proportional equation must give y = 0 — zero tacos, zero dollars. If x = 0 doesn't give 0, it's an imposter.
+              </div>`,
+            checkpoint: {
+              q: "Which equation is proportional?",
+              options: ["y = 5x", "y = 5 + x", "y = 2x + 3"],
+              correct: 0,
+              why: "Only y = 5x is a clean multiply (k = 5). The others add something on, so x = 0 wouldn't give y = 0."
+            }
+          },
+          {
+            title: "Even fractions fit — and you're ready",
+            html: `
+              <p>One sneaky case: what about <span class="math">y = x ÷ 4</span>? It looks different, but dividing by 4 is the <em>same</em> as multiplying by ¼:</p>
+              <div class="key-idea"><span class="tag">Still proportional</span>
+                <span class="math">y = x ÷ 4</span> is just <span class="math">y = ¼x</span>. The k is a fraction (¼), but it's still a clean multiply — so it passes the zero test.
               </div>
-              <p>Multiply forward, divide backward, and check with zero. That's the whole toolkit. 🧰</p>`
+              <p>Here's your toolkit: write it as <span class="math">y = kx</span>, multiply to go forward, divide to go backward, and check with zero. Let's try a few together. 🌱</p>`
           }
         ],
+        guided: {
+          intro: `You can now write the equation, run it both ways, and spot the real one. Let's do one of each — one small step at a time.`,
+          problems: [
+            {
+              title: "Write the equation",
+              context: `<p>A juice bar sells smoothies for <strong>$5 each</strong>. Let x = smoothies and y = total cost.</p>`,
+              visual: htmlTable([1, 2, 3], [5, 10, 15], -1, "smoothies", "cost ($)"),
+              steps: [
+                {
+                  prompt: `What is k — the cost of one smoothie?`,
+                  type: "numeric", answer: 5, unit: "$",
+                  hint: `k is the price of a single smoothie.`,
+                  teach: `Each smoothie is $5, so k = 5.`
+                },
+                {
+                  prompt: `Now write the equation. Which one fits?`,
+                  type: "choice",
+                  choices: ["y = 5x", "y = x + 5", "y = 5 ÷ x"],
+                  answer: 0,
+                  hint: `Proportional always looks like y = kx.`,
+                  teach: `y = kx with k = 5 gives <strong>y = 5x</strong>.`
+                }
+              ],
+              recap: `<p>k = 5, so the equation is <strong>y = 5x</strong>.</p>`
+            },
+            {
+              title: "Forward — find the total",
+              context: `<p>A printer prints <strong>6 pages a minute</strong>, so <span class="math">y = 6x</span> (x = minutes, y = pages).</p>`,
+              steps: [
+                {
+                  prompt: `You know the minutes and want the pages. Which direction is that?`,
+                  type: "choice",
+                  choices: ["Forward — multiply", "Backward — divide"],
+                  answer: 0,
+                  hint: `Know x, want y.`,
+                  teach: `Know x, want y → <strong>forward</strong> → multiply by k.`
+                },
+                {
+                  prompt: `In 8 minutes: 6 × 8 = ?`,
+                  type: "numeric", answer: 48, unit: "pages",
+                  teach: `6 × 8 = <strong>48 pages</strong>.`
+                }
+              ],
+              recap: `<p>Forward means multiply: 6 × 8 = <strong>48 pages</strong>.</p>`
+            },
+            {
+              title: "Backward — find how many",
+              context: `<p>Tacos are $4 each, so <span class="math">y = 4x</span>. You spent <strong>$36</strong>.</p>`,
+              steps: [
+                {
+                  prompt: `You know the cost (y = 36) and want the number of tacos (x). Which direction?`,
+                  type: "choice",
+                  choices: ["Forward — multiply", "Backward — divide"],
+                  answer: 1,
+                  hint: `Know y, want x.`,
+                  teach: `Know y, want x → <strong>backward</strong> → divide by k.`
+                },
+                {
+                  prompt: `Solve 36 = 4x. What is 36 ÷ 4?`,
+                  type: "numeric", answer: 9, unit: "tacos",
+                  teach: `36 ÷ 4 = <strong>9 tacos</strong>.`
+                }
+              ],
+              recap: `<p>Backward means divide: 36 ÷ 4 = <strong>9 tacos</strong>.</p>`
+            },
+            {
+              title: "Spot the proportional one",
+              context: `<p>Three equations are lined up. Only one is proportional.</p>`,
+              steps: [
+                {
+                  prompt: `Which one is a clean multiply, y = kx?`,
+                  type: "choice",
+                  choices: ["y = 7x", "y = 7 + x", "y = 7x − 2"],
+                  answer: 0,
+                  hint: `Proportional adds nothing and subtracts nothing.`,
+                  teach: `y = 7x just multiplies x by 7 — nothing added on.`
+                },
+                {
+                  prompt: `Zero test: in y = 7x, if x = 0, what is y?`,
+                  type: "numeric", answer: 0,
+                  teach: `7 × 0 = <strong>0</strong>. x = 0 gives y = 0, so it's proportional. ✓`
+                }
+              ],
+              recap: `<p>y = 7x is the proportional one, and it passes the zero test (x = 0 → y = 0).</p>`
+            }
+          ]
+        },
         generate() {
           const v = ri(1, 4);
           const contexts = [
@@ -1527,50 +1785,179 @@ const UNITS = [
         blurb: "A straight line through (0, 0) — and what its points are telling you.",
         pages: [
           {
-            title: "The picture is always the same",
+            title: "Every proportional graph looks the same",
             html: `
-              <p>Graph any proportional relationship and you get the same picture every single time:</p>
-              <ul>
-                <li>A perfectly <strong>straight line</strong>…</li>
-                <li>…through the <strong>origin (0, 0)</strong> — because zero of one thing means zero of the other.</li>
-              </ul>
+              <p>Here's a treat: graph <em>any</em> proportional relationship and you get the same shape every single time — a <strong>straight line that starts at the corner (0, 0)</strong>.</p>
               <div class="teach-visual">${svgGraph(2, 3)}</div>
-              <p>This line is <span class="math">y = 2x</span>. Steeper lines have bigger k; gentler lines have smaller k.</p>`
+              <p>This is the cost of strawberries at $2 a pound: <span class="math">y = 2x</span>. The dot at (3, 6) says “3 pounds cost $6.” Every proportional graph is a straight ramp like this.</p>
+              <div class="key-idea"><span class="tag">Key idea</span>
+                A proportional graph is a <strong>straight line</strong> through the <strong>origin (0, 0)</strong>.
+              </div>`
           },
           {
-            title: "Reading k off the graph",
+            title: "Why it always starts at (0, 0)",
             html: `
-              <p>Any point on the line will hand you k — just divide:</p>
+              <p>Why must the line touch the corner? Think about the strawberries: buy <strong>zero</strong> pounds, pay <strong>zero</strong> dollars. Zero of x always means zero of y.</p>
+              <div class="teach-visual">${svgGraph(3, 2)}</div>
+              <p>So the line always launches from that bottom-left corner, the origin. A line that <em>misses</em> the corner is a warning sign — it's not proportional.</p>
+              <div class="key-idea"><span class="tag">The origin clue</span>
+                Through (0, 0) → it could be proportional. Misses (0, 0) → definitely not.
+              </div>`
+          },
+          {
+            title: "Steeper means a bigger k",
+            html: `
+              <p>The <em>steepness</em> of the line is just k in disguise. A bigger k tilts the ramp up faster. Compare these two:</p>
+              <div class="teach-visual">${svgGraph(1, 5)}</div>
+              <p>Gentle ramp: <span class="math">y = 1x</span> (k = 1).</p>
+              <div class="teach-visual">${svgGraph(2, 4)}</div>
+              <p>Steeper ramp: <span class="math">y = 2x</span> (k = 2) — same x's, but y climbs twice as fast.</p>
+              <div class="key-idea"><span class="tag">Read the tilt</span>
+                Steeper line → bigger k. Gentler line → smaller k.
+              </div>`
+          },
+          {
+            title: "Reading k off any point",
+            html: `
+              <p>You don't need the equation to find k — any point on the line hands it to you. Just divide:</p>
               <div class="key-idea"><span class="tag">Key idea</span>
-                For any point on the line: <span class="math">k = y ÷ x</span>. The point <span class="math">(1, k)</span> is the shortcut — when x is 1, y <em>is</em> k.
+                For any point on the line, <span class="math">k = y ÷ x</span>. The point <span class="math">(1, k)</span> is the shortcut — when x is 1, y <em>is</em> k.
               </div>
+              <div class="teach-visual">${svgGraph(3, 2)}</div>
               <div class="example"><span class="tag">Worked example</span>
-                <p>A strawberry-cost graph passes through (4, 12) — x in pounds, y in dollars.</p>
-                <p><strong>Find k:</strong> 12 ÷ 4 = <strong>3</strong> → strawberries cost $3 per pound.</p>
-                <p><strong>Equation:</strong> y = 3x. <strong>Meaning of (4, 12):</strong> "4 pounds cost $12." That's it!</p>
+                <p>The dot is at (2, 6). <strong>Find k:</strong> 6 ÷ 2 = <strong>3</strong>. So strawberries are $3 a pound, and the line is <span class="math">y = 3x</span>.</p>
               </div>`,
             checkpoint: {
               q: "A proportional graph passes through (5, 20). What is k?",
               options: ["4", "15", "100"],
               correct: 0,
-              why: "k = y ÷ x = 20 ÷ 5 = 4. (Subtracting 20 − 5 = 15 is a common slip — k is a quotient, not a difference.)"
+              why: "k = y ÷ x = 20 ÷ 5 = 4. (Subtracting 20 − 5 = 15 is a common slip — k is a divide, not a subtract.)"
             }
           },
           {
-            title: "Points are sentences",
+            title: "Every point is a little sentence",
             html: `
-              <p>Every point on a real-world graph is secretly a sentence. The first coordinate is x's quantity, the second is y's:</p>
+              <p>On a real-world graph, every point quietly tells a story. The first number is x's amount, the second is y's:</p>
               <ul>
-                <li>(3, 12) on a cost-vs-pounds graph → "3 pounds cost $12."</li>
-                <li>(2, 8) on a distance-vs-hours graph → "in 2 hours, 8 miles."</li>
-                <li>(0, 0) on every proportional graph → "none of x, none of y."</li>
+                <li>(3, 12) on a cost-vs-pounds graph → “3 pounds cost $12.”</li>
+                <li>(2, 8) on a miles-vs-hours graph → “in 2 hours, 8 miles.”</li>
+                <li>(0, 0) on any proportional graph → “none of one, none of the other.”</li>
               </ul>
+              <div class="teach-visual">${svgGraph(4, 2)}</div>
               <div class="key-idea"><span class="tag">Order matters</span>
-                It's always (x, y) — across the hall first, then up the stairs. Mixing the order flips the meaning.
-              </div>
-              <p>Straight line, through the origin, every point a sentence. You can read graphs now. 📈</p>`
+                Always (x, y) — across first, then up. Flip the order and you flip the meaning.
+              </div>`,
+            checkpoint: {
+              q: "On a cost-vs-pounds graph, the point (2, 8) is marked. What does it mean?",
+              options: ["2 pounds cost $8", "8 pounds cost $2", "each pound costs $2"],
+              correct: 0,
+              why: "Points are read (x, y): x = 2 pounds, y = $8, so 2 pounds cost $8. (The price per pound, k, would be 8 ÷ 2 = $4.)"
+            }
+          },
+          {
+            title: "Straight line, through the origin, every point a sentence",
+            html: `
+              <p>You can read proportional graphs now. The three tells:</p>
+              <ul>
+                <li>It's a <strong>straight line</strong>.</li>
+                <li>It goes through the <strong>origin (0, 0)</strong>.</li>
+                <li>Every point is a <strong>sentence</strong> in (x, y) order, and <span class="math">k = y ÷ x</span> from any of them.</li>
+              </ul>
+              <p>Let's read a few graphs together. 🌱</p>`
           }
         ],
+        guided: {
+          intro: `Let's read graphs together — finding k, checking the origin, and turning points into sentences, one step at a time.`,
+          problems: [
+            {
+              title: "Find k from a point",
+              context: `<p>This graph shows the cost of gas. Use the labeled point to find the price per gallon.</p>`,
+              visual: svgGraph(2, 4),
+              steps: [
+                {
+                  prompt: `To find k from a point on the line, what do you do?`,
+                  type: "choice",
+                  choices: ["Add x + y", "Divide y ÷ x", "Subtract y − x"],
+                  answer: 1,
+                  hint: `k = y ÷ x.`,
+                  teach: `Divide y ÷ x. Adding or subtracting wouldn't give a “per one” rate.`
+                },
+                {
+                  prompt: `The point is (4, 8). What is 8 ÷ 4?`,
+                  type: "numeric", answer: 2, unit: "$/gal",
+                  hint: `Read the dot as (x, y) = (4, 8).`,
+                  teach: `8 ÷ 4 = <strong>2</strong>. Gas is $2 a gallon, so the line is y = 2x.`
+                }
+              ],
+              recap: `<p>k = y ÷ x = 8 ÷ 4 = <strong>2</strong> ($2 per gallon).</p>`
+            },
+            {
+              title: "The origin check",
+              context: `<p>Two straight lines are drawn. Which one could be proportional?</p>`,
+              steps: [
+                {
+                  prompt: `Every proportional graph must pass through which point?`,
+                  type: "choice",
+                  choices: ["(0, 0), the origin", "(1, 1)", "(0, 3)"],
+                  answer: 0,
+                  hint: `Zero of x means zero of y.`,
+                  teach: `It must hit <strong>(0, 0)</strong> — none of x goes with none of y.`
+                },
+                {
+                  prompt: `One line is straight but crosses the y-axis at (0, 3), not the corner. Is it proportional?`,
+                  type: "choice",
+                  choices: ["Yes", "No — it misses the origin"],
+                  answer: 1,
+                  teach: `Straight but starting at (0, 3) means it misses the origin — so it's <strong>not</strong> proportional.`
+                }
+              ],
+              recap: `<p>Proportional graphs go through (0, 0). Miss the origin → not proportional.</p>`
+            },
+            {
+              title: "Read what a point means",
+              context: `<p>This is a runner's distance over time — x in hours, y in miles.</p>`,
+              visual: svgGraph(3, 2),
+              steps: [
+                {
+                  prompt: `The dot is at (2, 6). Reading (x, y), how many hours is x?`,
+                  type: "numeric", answer: 2, unit: "hours",
+                  hint: `The first coordinate is x.`,
+                  teach: `x = <strong>2 hours</strong> — the first coordinate.`
+                },
+                {
+                  prompt: `And how many miles is y?`,
+                  type: "numeric", answer: 6, unit: "miles",
+                  teach: `y = <strong>6 miles</strong>. So the point means “6 miles in 2 hours.”`
+                },
+                {
+                  prompt: `So the speed k (miles per hour) = 6 ÷ 2 = ?`,
+                  type: "numeric", answer: 3, unit: "mph",
+                  teach: `6 ÷ 2 = <strong>3 mph</strong> — the runner's steady speed.`
+                }
+              ],
+              recap: `<p>(2, 6) → “6 miles in 2 hours,” and k = 6 ÷ 2 = <strong>3 mph</strong>.</p>`
+            },
+            {
+              title: "Predict a new point",
+              context: `<p>Apples cost a steady price. The graph's labeled point is (3, 6) — x in pounds, y in dollars.</p>`,
+              visual: svgGraph(2, 3),
+              steps: [
+                {
+                  prompt: `Find k from the point: 6 ÷ 3 = ?`,
+                  type: "numeric", answer: 2, unit: "$/lb",
+                  hint: `k = y ÷ x.`,
+                  teach: `6 ÷ 3 = <strong>2</strong>, so apples are $2 a pound and the line is y = 2x.`
+                },
+                {
+                  prompt: `Use the line's pattern. At x = 5 pounds, y = 2 × 5 = ?`,
+                  type: "numeric", answer: 10, unit: "$",
+                  teach: `2 × 5 = <strong>$10</strong>. The straight line lets you predict any new point.`
+                }
+              ],
+              recap: `<p>k = 2 ($2/lb), so 5 pounds cost 2 × 5 = <strong>$10</strong>.</p>`
+            }
+          ]
+        },
         generate() {
           const v = ri(1, 4);
           if (v === 1) {
@@ -1664,52 +2051,174 @@ const UNITS = [
         blurb: "Tell proportional from not — in a table, an equation, or a graph.",
         pages: [
           {
-            title: "Three ways to be sure",
+            title: "One idea, three costumes",
             html: `
-              <p>By now you can spot a proportional relationship three different ways — and they all check the <em>same</em> thing: that y is always the same multiple of x.</p>
+              <p>You've met proportional relationships three different ways now — in a <strong>table</strong>, as an <strong>equation</strong>, and on a <strong>graph</strong>. The cool part: they're all checking the exact same thing — that y is always the same steady multiple of x.</p>
+              <div class="teach-visual">${htmlTable([1, 2, 3], [4, 8, 12], -1, "x", "y")}</div>
+              <p>This table, the equation <span class="math">y = 4x</span>, and a straight line through (0, 0) are three pictures of the <em>same</em> relationship.</p>
+              <div class="key-idea"><span class="tag">Key idea</span>
+                Same k in every row · <span class="math">y = kx</span> · straight line through (0, 0). Find one, you've found them all.
+              </div>`
+          },
+          {
+            title: "The table tell",
+            html: `
+              <p>In a <strong>table</strong>, the check is the every-row test: divide y ÷ x in each row and make sure you get the <em>same</em> k every time.</p>
+              <div class="teach-visual">${htmlTable([2, 4, 6], [6, 12, 18], -1, "x", "y")}</div>
+              <p>6 ÷ 2 = 3,&nbsp; 12 ÷ 4 = 3,&nbsp; 18 ÷ 6 = 3. All match → proportional, with k = 3.</p>
+              <div class="key-idea"><span class="tag">Table tell</span>
+                Every row gives the same k → proportional. One row off → not.
+              </div>`
+          },
+          {
+            title: "The equation tell",
+            html: `
+              <p>In an <strong>equation</strong>, proportional means a clean multiply: <span class="math">y = kx</span>, with nothing added or subtracted.</p>
               <ul>
-                <li><strong>In a table:</strong> y ÷ x gives the <em>same k</em> in every single row.</li>
-                <li><strong>In an equation:</strong> it looks like <span class="math">y = kx</span> — a pure multiply, nothing added or subtracted.</li>
-                <li><strong>On a graph:</strong> a <em>straight line through the origin</em> (0, 0).</li>
+                <li><span class="math">y = 3x</span> ✓ proportional (k = 3).</li>
+                <li><span class="math">y = 3x + 2</span> ✗ has a “+2” tacked on.</li>
               </ul>
-              <div class="key-idea"><span class="tag">One idea, three costumes</span>
-                Same k in every row · y = kx · straight line through (0, 0). Find one, you've found them all.
+              <div class="key-idea"><span class="tag">The zero test</span>
+                Plug in x = 0. Proportional equations give y = 0. If x = 0 doesn't land on 0, it's not proportional.
+              </div>`
+          },
+          {
+            title: "The graph tell",
+            html: `
+              <p>On a <strong>graph</strong>, proportional means a <em>straight line through the origin (0, 0)</em>.</p>
+              <div class="teach-visual">${svgGraph(3, 2)}</div>
+              <p>Straight? ✓ Starts at the corner? ✓ → proportional, and you can read k from any point: 6 ÷ 2 = 3.</p>
+              <div class="key-idea"><span class="tag">Graph tell</span>
+                Straight line + through (0, 0) → proportional. Curved, or missing the corner → not.
               </div>`
           },
           {
             title: "Meet the imposters",
             html: `
-              <p>Non-proportional relationships give themselves away:</p>
+              <p>Non-proportional relationships always slip up somewhere. Watch for these:</p>
               <ul>
-                <li><span class="math">y = x + 4</span> — it <strong>adds</strong>. At x = 0 you'd get y = 4, not 0. ❌</li>
+                <li><span class="math">y = x + 4</span> — it <strong>adds</strong>. At x = 0 you'd get 4, not 0. ❌</li>
                 <li>A table where y ÷ x is 5, then 4, then 6 — the multiple <strong>wanders</strong>. ❌</li>
-                <li>A line that's straight but <strong>misses the origin</strong> — close, but not proportional. ❌</li>
+                <li>A straight line that <strong>misses the origin</strong> — close, but no. ❌</li>
               </ul>
-              <div class="key-idea"><span class="tag">The zero test</span>
-                Whatever the form, ask: "Zero of x → zero of y?" If not, it isn't proportional.
-              </div>
-              <div class="example"><span class="tag">Worked example</span>
-                <p>Is <span class="math">y = 3x</span> proportional? x = 0 → y = 0 ✓, and it's a pure multiply ✓. <strong>Yes.</strong></p>
-                <p>Is <span class="math">y = 3x + 1</span> proportional? x = 0 → y = 1 ✗. <strong>No</strong> — that "+1" breaks it.</p>
+              <div class="teach-visual">${htmlTable([1, 2, 3], [5, 8, 11], -1, "x", "y")}</div>
+              <p>This table looks neat, but 5 ÷ 1 = 5, 8 ÷ 2 = 4, 11 ÷ 3 ≈ 3.7 — the k wanders, so it's an imposter.</p>
+              <div class="key-idea"><span class="tag">The one test that always works</span>
+                Ask: “Zero of x → zero of y?” If not, it isn't proportional — in any form.
               </div>`,
             checkpoint: {
               q: "Which relationship is proportional?",
-              options: ["y = 6x", "y = 6 + x", "y = x − 2"],
+              options: ["y = 6x", "y = 6 + x", "A straight line through (0, 4)"],
               correct: 0,
-              why: "Only y = 6x is a pure multiply (k = 6). The other two add or subtract, so x = 0 doesn't give y = 0."
+              why: "Only y = 6x is a clean multiply (k = 6) that passes through the origin. Adding 6, or a line starting at (0, 4), both miss (0, 0)."
             }
           },
           {
             title: "Find k, then finish the job",
             html: `
-              <p>Once you've decided it really <em>is</em> proportional, every question is the same two moves:</p>
+              <p>Once you're sure it's proportional, every question becomes the same two moves:</p>
               <ul>
                 <li><strong>Find k</strong> from any complete pair: k = y ÷ x.</li>
                 <li><strong>Use y = kx</strong> — multiply to go forward, divide to go backward.</li>
               </ul>
-              <p>Table, equation, or graph — they're all just different doors into the same little machine. You've got this. 🌟</p>`
+              <p>Table, equation, or graph — they're all just different doors into the same little machine. Let's put it all together. 🌟</p>`,
+            checkpoint: {
+              q: "A relationship is proportional with k = 4. If x = 7, what is y?",
+              options: ["28", "11", "1.75"],
+              correct: 0,
+              why: "y = kx = 4 × 7 = 28. (Adding 4 + 7 = 11 forgets that proportional means multiply.)"
+            }
           }
         ],
+        guided: {
+          intro: `Let's pull the whole unit together — judging tables, equations, and graphs, then solving a real one. One step at a time.`,
+          problems: [
+            {
+              title: "Is the table proportional?",
+              context: `<p>Check this table the careful way — every row.</p>`,
+              visual: htmlTable([2, 5, 8], [6, 15, 24], -1, "x", "y"),
+              steps: [
+                {
+                  prompt: `Row 1: 6 ÷ 2 = ?`,
+                  type: "numeric", answer: 3,
+                  teach: `Row 1 gives k = <strong>3</strong>.`
+                },
+                {
+                  prompt: `Row 2: 15 ÷ 5 = ?`,
+                  type: "numeric", answer: 3,
+                  teach: `Still <strong>3</strong> — matching so far.`
+                },
+                {
+                  prompt: `Every row gives 3, so the table is…`,
+                  type: "choice",
+                  choices: ["proportional", "not proportional"],
+                  answer: 0,
+                  teach: `Same k in every row → <strong>proportional</strong> (k = 3).`
+                }
+              ],
+              recap: `<p>Every row gives 3, so it's <strong>proportional</strong> with k = 3.</p>`
+            },
+            {
+              title: "Is the equation proportional?",
+              context: `<p>Decide whether <span class="math">y = 2x + 1</span> is proportional.</p>`,
+              steps: [
+                {
+                  prompt: `Does y = 2x + 1 add anything on?`,
+                  type: "choice",
+                  choices: ["Yes — there's a “+ 1”", "No"],
+                  answer: 0,
+                  hint: `Proportional equations are a clean multiply, nothing added.`,
+                  teach: `The “+ 1” means it isn't a clean multiply.`
+                },
+                {
+                  prompt: `Zero test: if x = 0, then y = 2(0) + 1 = ?`,
+                  type: "numeric", answer: 1,
+                  teach: `y = <strong>1</strong>, not 0 — so y = 2x + 1 is <strong>not</strong> proportional.`
+                }
+              ],
+              recap: `<p>x = 0 gives y = 1 (not 0), so <strong>not proportional</strong>.</p>`
+            },
+            {
+              title: "Is the graph proportional?",
+              context: `<p>Look at the line, then read its k.</p>`,
+              visual: svgGraph(2, 3),
+              steps: [
+                {
+                  prompt: `Is the line straight AND through (0, 0)?`,
+                  type: "choice",
+                  choices: ["Yes — proportional", "No"],
+                  answer: 0,
+                  hint: `Check both: straight, and touching the corner.`,
+                  teach: `Straight and through the origin → <strong>proportional</strong>.`
+                },
+                {
+                  prompt: `Read k from the point (3, 6): 6 ÷ 3 = ?`,
+                  type: "numeric", answer: 2,
+                  teach: `k = <strong>2</strong>, so the line is y = 2x.`
+                }
+              ],
+              recap: `<p>Straight, through (0, 0), with k = 6 ÷ 3 = <strong>2</strong> → proportional.</p>`
+            },
+            {
+              title: "Find k, then solve",
+              context: `<p>A car uses gas proportionally: it goes <strong>90 miles on 3 gallons</strong>.</p>`,
+              steps: [
+                {
+                  prompt: `Find k (miles per gallon): 90 ÷ 3 = ?`,
+                  type: "numeric", answer: 30, unit: "mpg",
+                  hint: `k = y ÷ x = miles ÷ gallons.`,
+                  teach: `90 ÷ 3 = <strong>30</strong> miles per gallon.`
+                },
+                {
+                  prompt: `How far on 5 gallons? 30 × 5 = ?`,
+                  type: "numeric", answer: 150, unit: "miles",
+                  teach: `30 × 5 = <strong>150 miles</strong>. Find k, then use y = kx.`
+                }
+              ],
+              recap: `<p>k = 30 mpg, so 5 gallons → 30 × 5 = <strong>150 miles</strong>.</p>`
+            }
+          ]
+        },
         generate() {
           const v = ri(1, 3);
           if (v === 1) {
