@@ -2,14 +2,16 @@
    MathBloom — Summer Math Plan (parent-coach lesson plan)
    Math 6 Plus Preview • Units 4, 8 & 9 • Jun 15 – Aug 21, 2026
 
-   The first two weeks are fully built out as FOUR complete,
-   hour-long MathBloom lessons, two per week, with each week a
+   The first FOUR weeks are fully built out as eight complete,
+   hour-long MathBloom lessons, two per week, each week a
    clearly distinct concept:
      Week 1 — Scaling Shapes (scale factors + area)
      Week 2 — Scale Drawings & Maps (real-world application)
-   Each session is a full lesson with three parts in the app:
-   Learn → Work it through (guided) → Practice. Weeks 3–10 are a
-   light preview. renderPlan() in app.js renders this.
+     Week 3 — Proportional Relationships: Tables & Equations (Unit 8)
+     Week 4 — Proportional Relationships: Graphs & Spotting Them (Unit 8)
+   Weeks 1–2 run Learn → Work it through (guided) → Practice;
+   the Unit 8 lessons (weeks 3–4) run Learn → Practice. Weeks
+   5–10 are a light preview. renderPlan() in app.js renders this.
 
    IM student lesson URL pattern (verified):
      https://im.kendallhunt.com/MS/students/2/{unit}/{lesson}/index.html
@@ -29,7 +31,7 @@ const SUMMER_PLAN = {
   range: "June 15 – August 21, 2026",
   cadence: "2 sessions a week · about 1 hour each",
   intro:
-    "Two weeks, four hour-long lessons, two distinct concepts. <strong>Week 1</strong> is the geometry of scaling — scale factors and how area grows. <strong>Week 2</strong> takes it into the real world — maps, floor plans, and making your own scale drawings. Each session is a complete MathBloom lesson with three parts: <strong>Learn</strong> it, <strong>Work it through</strong> together one step at a time, then <strong>Practice</strong> until the flower blooms. No timers, no grades — the goal is for these to feel <em>familiar</em> next year, not perfect now.",
+    "Four weeks, eight hour-long lessons. <strong>Weeks 1–2</strong> are the geometry of scaling — scale factors, how area grows, and reading &amp; making scale drawings. <strong>Weeks 3–4</strong> open Unit 8, proportional relationships — the constant of proportionality in tables, the equation <span class=\"math\">y = kx</span>, graphs through the origin, and telling proportional from not. Each session is a complete MathBloom lesson: <strong>Learn</strong> it, then <strong>Practice</strong> until the flower blooms — the scaling lessons add a guided <strong>Work it through</strong> step in between. No timers, no grades — the goal is for these to feel <em>familiar</em> next year, not perfect now.",
 
   // weeks fully built out — 2 sessions/week, ~1 hour each
   weeks: [
@@ -142,18 +144,123 @@ const SUMMER_PLAN = {
         },
       ],
     },
+    {
+      n: 3,
+      dates: "Jun 29 – Jul 3",
+      focus: "Week 3 — Proportional Relationships: Tables & Equations",
+      canDo: "Find the constant of proportionality k from a table (k = y ÷ x), test a table by checking every row, and write and use the equation y = kx forward and backward.",
+      sessions: [
+        {
+          id: "w3s1",
+          label: "S1",
+          day: "Mon · Jun 29",
+          title: "Tables & the Constant of Proportionality",
+          minutes: "~50 min",
+          lessonId: "u8l1",
+          im: [
+            IM(2, 1, "One of These Things Is Not Like the Others"),
+            IM(2, 2, "Introducing Proportional Relationships with Tables"),
+            IM(2, 3, "More about Constant of Proportionality"),
+          ],
+          objective:
+            "Meet proportional relationships: find the constant of proportionality k by dividing y ÷ x in any row, use it to fill in a missing value, test a whole table by checking every row, and say what k means as a “per one” amount.",
+          steps: [
+            { kind: "warmup", time: "5 min", label: "Warm up", body: "Quick back-and-forth: <em>“If one muffin costs $2, what do 3 cost? What about 5?”</em> Notice you multiply by the same 2 every time — that steady multiplier is the whole idea this week." },
+            { kind: "learn", time: "20 min", label: "Learn it", body: "Open the lesson below and read the three <strong>🌱 Learn</strong> pages — the hidden multiplier (<span class=\"math\">k = y ÷ x</span>), the one-row trick &amp; the every-row test, and what <span class=\"math\">k</span> actually means — answering the checkpoint as you go." },
+            { kind: "practice", time: "25 min", label: "Practice &amp; bloom", body: "Open <strong>🌸 Practice</strong> and answer until the flower blooms (5 petals) — finding k, filling a missing value, deciding whether a table is proportional, and reading k as a “per one” amount. Hints and “show me the steps” are always free." },
+            { kind: "check", time: "—", label: "Exit check", body: "Away from the screen: <em>A proportional table shows x = 3 → y = 12. Find y when x = 7.</em> &nbsp;→&nbsp; k = 12 ÷ 3 = 4, so y = 7 × 4 = <strong>28</strong>." },
+          ],
+          coach:
+            "The one habit behind all of Unit 8: divide <em>y ÷ x</em> to get k, then check it's the same in every row — one row that disagrees means it isn't proportional. Heads up: these Unit 8 lessons go straight <strong>Learn → Practice</strong> (no separate “Work it through” step yet), so the worked examples live right inside the Learn pages.",
+        },
+        {
+          id: "w3s2",
+          label: "S2",
+          day: "Thu · Jul 2",
+          title: "Equations of the Form y = kx",
+          minutes: "~50 min",
+          lessonId: "u8l2",
+          im: [
+            IM(2, 4, "Proportional Relationships and Equations"),
+            IM(2, 5, "Two Equations for Each Relationship"),
+            IM(2, 6, "Using Equations to Solve Problems"),
+          ],
+          objective:
+            "Capture a whole proportional relationship in one tiny equation, y = kx — then use it forward (know x, multiply) and backward (know y, divide), and spot the real proportional equation with the x = 0 test.",
+          steps: [
+            { kind: "warmup", time: "5 min", label: "Warm up", body: "Ask: <em>“Tacos are $4 each — what's the total for 7? For 100?”</em> Then the hook: <em>“Could you write ONE rule that handles any number of tacos?”</em> (That rule is y = 4x.)" },
+            { kind: "learn", time: "20 min", label: "Learn it", body: "Read the three <strong>🌱 Learn</strong> pages: turning a table into the equation <span class=\"math\">y = kx</span>, running it forward &amp; backward (multiply vs. divide), and spotting the right equation with the zero test. Do the checkpoint." },
+            { kind: "practice", time: "25 min", label: "Practice &amp; bloom", body: "<strong>🌸 Practice</strong> until it blooms — choosing the equation that fits a story, solving forward (find y), solving backward (find x), and recovering k from a single pair of numbers." },
+            { kind: "check", time: "—", label: "Exit check", body: "<em>Ari bikes y = 12x miles in x hours. How long is a 36-mile ride?</em> &nbsp;→&nbsp; backward, so divide: 36 ÷ 12 = <strong>3 hours</strong>." },
+          ],
+          coach:
+            "Two slogans carry this lesson: <em>forward questions multiply, backward questions divide</em>, and a true proportional equation always passes the <strong>zero test</strong> (x = 0 must give y = 0, so “y = x + 4” is out). End-of-week-3 goal: read a table for k and write its equation y = kx.",
+        },
+      ],
+    },
+    {
+      n: 4,
+      dates: "Jul 6 – 10",
+      focus: "Week 4 — Proportional Relationships: Graphs & Spotting Them",
+      canDo: "Recognize a proportional graph (a straight line through the origin), read k off any point, explain what a point means in (x, y) order, and tell proportional from non-proportional in a table, equation, or graph.",
+      sessions: [
+        {
+          id: "w4s1",
+          label: "S1",
+          day: "Mon · Jul 6",
+          title: "Graphs of Proportional Relationships",
+          minutes: "~50 min",
+          lessonId: "u8l3",
+          im: [
+            IM(2, 10, "Introducing Graphs of Proportional Relationships"),
+            IM(2, 11, "Interpreting Graphs of Proportional Relationships"),
+          ],
+          objective:
+            "See that every proportional relationship graphs as a straight line through (0, 0), read the constant k off any point with k = y ÷ x (the point (1, k) is the shortcut), and turn any point into a real-world sentence in (x, y) order.",
+          steps: [
+            { kind: "warmup", time: "5 min", label: "Warm up", body: "Before opening anything, ask them to picture it: <em>“If strawberries are $3 a pound, what does a graph of cost vs. pounds look like — straight or curved? Where does it start?”</em> (Straight, beginning at (0, 0).)" },
+            { kind: "learn", time: "20 min", label: "Learn it", body: "Read the three <strong>🌱 Learn</strong> pages: the picture is always the same (a line through the origin), reading <span class=\"math\">k</span> off the graph (<span class=\"math\">k = y ÷ x</span>; the (1, k) shortcut), and how every point is secretly a sentence in (x, y) order. Do the checkpoint." },
+            { kind: "practice", time: "25 min", label: "Practice &amp; bloom", body: "<strong>🌸 Practice</strong> until it blooms — finding k from a labeled point, picking the point every proportional graph shares ((0, 0)), reading what a point means, and predicting a new y from the line's pattern." },
+            { kind: "check", time: "—", label: "Exit check", body: "<em>A proportional graph passes through (5, 20). What is k?</em> &nbsp;→&nbsp; k = y ÷ x = 20 ÷ 5 = <strong>4</strong> (not 20 − 5)." },
+          ],
+          coach:
+            "The big connection: it's the <em>same k</em> three ways now — in a table it's y ÷ x in a row, in an equation it's the number in front of x, and on a graph it's the steepness (read from any point as y ÷ x, easiest at (1, k)). The classic slip is subtracting instead of dividing — the in-app steps catch it.",
+        },
+        {
+          id: "w4s2",
+          label: "S2",
+          day: "Thu · Jul 9",
+          title: "Proportional or Not? — Unit 8 Wrap-Up",
+          minutes: "~50 min",
+          lessonId: "u8l4",
+          im: [
+            IM(2, 7, "Comparing Relationships with Tables"),
+            IM(2, 8, "Comparing Relationships with Equations"),
+            IM(2, 9, "Solving Problems about Proportional Relationships"),
+          ],
+          objective:
+            "Tie the whole unit together: decide whether a relationship is proportional from a table, an equation, OR a graph, spot the imposters (anything that adds or subtracts, or a graph that misses the origin), then find k and solve a real problem with y = kx.",
+          steps: [
+            { kind: "warmup", time: "5 min", label: "Warm up", body: "See if they can list the three tells from memory: <em>same k in every row · the equation is y = kx · a straight line through the origin.</em> Fill in any they miss together." },
+            { kind: "learn", time: "20 min", label: "Learn it", body: "Read the three <strong>🌱 Learn</strong> pages: the three ways to be sure, meeting the imposters (the zero test), and the find-k-then-finish routine. Do the checkpoint — the one that asks which equation is the proportional one." },
+            { kind: "practice", time: "25 min", label: "Practice &amp; bloom", body: "<strong>🌸 Practice</strong> until it blooms — judging tables, judging equations, and real two-step problems (find k, then use y = kx). If any earlier lesson felt shaky, replay its Practice first — re-blooming is the best review there is." },
+            { kind: "check", time: "—", label: "Exit check", body: "<em>Is y = x + 5 proportional? Why or why not?</em> &nbsp;→&nbsp; <strong>No</strong> — it adds 5, so x = 0 gives y = 5 (not 0); the graph would miss the origin." },
+          ],
+          coach:
+            "This is the unit's payoff — recognizing proportionality in any form and knowing the imposters on sight. Narrating <em>why</em> each one is or isn't proportional out loud is the real test. Next up: Unit 9 — percentages (percent increase &amp; decrease).",
+        },
+      ],
+    },
   ],
 
-  // light preview of the rest of summer (weeks 3–10)
+  // light preview of the rest of summer (weeks 5–10)
   upcoming: [
-    { n: 3, dates: "Jun 29 – Jul 3", focus: "Unit 4 — Changing scales + wrap-up", unit: "u4" },
-    { n: 4, dates: "Jul 6 – 10", focus: "Unit 8 — Proportional relationships in tables", unit: "u8" },
-    { n: 5, dates: "Jul 13 – 17", focus: "Unit 8 — Equations; proportional or not?", unit: "u8" },
-    { n: 6, dates: "Jul 20 – 24", focus: "Unit 8 — Graphs + wrap-up", unit: "u8" },
-    { n: 7, dates: "Jul 27 – 31", focus: "Unit 9 — Rates with fractions", unit: "u9" },
-    { n: 8, dates: "Aug 3 – 7", focus: "Unit 9 — Percent increase & decrease", unit: "u9" },
-    { n: 9, dates: "Aug 10 – 14", focus: "Unit 9 — Applying percentages", unit: "u9" },
-    { n: 10, dates: "Aug 17 – 21", focus: "Unit 9 wrap-up + cumulative review", unit: "u9" },
+    { n: 5, dates: "Jul 13 – 17", focus: "Unit 9 — Percent increase & decrease", unit: "u9" },
+    { n: 6, dates: "Jul 20 – 24", focus: "Unit 9 — Tax, tip & discount", unit: "u9" },
+    { n: 7, dates: "Jul 27 – 31", focus: "Unit 9 — Finding the percent & percent error", unit: "u9" },
+    { n: 8, dates: "Aug 3 – 7", focus: "Unit 9 — Applying percentages", unit: "u9" },
+    { n: 9, dates: "Aug 10 – 14", focus: "Mixed review — scaling & proportional relationships", unit: "u8" },
+    { n: 10, dates: "Aug 17 – 21", focus: "Cumulative review + ready for fall", unit: "u9" },
   ],
 
   resources: [

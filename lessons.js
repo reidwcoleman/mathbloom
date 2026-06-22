@@ -1656,6 +1656,158 @@ const UNITS = [
             ]
           };
         }
+      },
+      // ================ U8 L4 ================
+      {
+        id: "u8l4",
+        title: "Proportional or Not?",
+        blurb: "Tell proportional from not — in a table, an equation, or a graph.",
+        pages: [
+          {
+            title: "Three ways to be sure",
+            html: `
+              <p>By now you can spot a proportional relationship three different ways — and they all check the <em>same</em> thing: that y is always the same multiple of x.</p>
+              <ul>
+                <li><strong>In a table:</strong> y ÷ x gives the <em>same k</em> in every single row.</li>
+                <li><strong>In an equation:</strong> it looks like <span class="math">y = kx</span> — a pure multiply, nothing added or subtracted.</li>
+                <li><strong>On a graph:</strong> a <em>straight line through the origin</em> (0, 0).</li>
+              </ul>
+              <div class="key-idea"><span class="tag">One idea, three costumes</span>
+                Same k in every row · y = kx · straight line through (0, 0). Find one, you've found them all.
+              </div>`
+          },
+          {
+            title: "Meet the imposters",
+            html: `
+              <p>Non-proportional relationships give themselves away:</p>
+              <ul>
+                <li><span class="math">y = x + 4</span> — it <strong>adds</strong>. At x = 0 you'd get y = 4, not 0. ❌</li>
+                <li>A table where y ÷ x is 5, then 4, then 6 — the multiple <strong>wanders</strong>. ❌</li>
+                <li>A line that's straight but <strong>misses the origin</strong> — close, but not proportional. ❌</li>
+              </ul>
+              <div class="key-idea"><span class="tag">The zero test</span>
+                Whatever the form, ask: "Zero of x → zero of y?" If not, it isn't proportional.
+              </div>
+              <div class="example"><span class="tag">Worked example</span>
+                <p>Is <span class="math">y = 3x</span> proportional? x = 0 → y = 0 ✓, and it's a pure multiply ✓. <strong>Yes.</strong></p>
+                <p>Is <span class="math">y = 3x + 1</span> proportional? x = 0 → y = 1 ✗. <strong>No</strong> — that "+1" breaks it.</p>
+              </div>`,
+            checkpoint: {
+              q: "Which relationship is proportional?",
+              options: ["y = 6x", "y = 6 + x", "y = x − 2"],
+              correct: 0,
+              why: "Only y = 6x is a pure multiply (k = 6). The other two add or subtract, so x = 0 doesn't give y = 0."
+            }
+          },
+          {
+            title: "Find k, then finish the job",
+            html: `
+              <p>Once you've decided it really <em>is</em> proportional, every question is the same two moves:</p>
+              <ul>
+                <li><strong>Find k</strong> from any complete pair: k = y ÷ x.</li>
+                <li><strong>Use y = kx</strong> — multiply to go forward, divide to go backward.</li>
+              </ul>
+              <p>Table, equation, or graph — they're all just different doors into the same little machine. You've got this. 🌟</p>`
+          }
+        ],
+        generate() {
+          const v = ri(1, 3);
+          if (v === 1) {
+            // Decide proportionality from a table.
+            const proportional = Math.random() < 0.5;
+            const k = pick([2, 3, 4]);
+            const xs = [2, 4, 6];
+            let ys = xs.map(x => x * k);
+            let brokenRow = -1;
+            if (!proportional) {
+              brokenRow = ri(1, 2);
+              ys[brokenRow] += pick([1, 2, -1]);
+            }
+            return {
+              prompt: `Is <span class="math">y</span> proportional to <span class="math">x</span> in this table?`,
+              visual: htmlTable(xs, ys),
+              type: "choice",
+              choices: ["Yes — y ÷ x is the same in every row", "No — y ÷ x changes from row to row"],
+              correctIndex: proportional ? 0 : 1,
+              hints: [
+                "Divide y by x in each row and compare the answers.",
+                `Row 1 gives ${clean(ys[0] / xs[0])}. Do the other rows match?`
+              ],
+              steps: proportional
+                ? [
+                    `Every row: ${xs.map((x, i) => `${clean(ys[i])}÷${clean(x)} = ${clean(ys[i] / x)}`).join(", &nbsp;")}.`,
+                    `All the same, so <strong>yes — it's proportional</strong> with k = ${k}.`
+                  ]
+                : [
+                    `Most rows give ${k}, but row ${brokenRow + 1} gives ${clean(ys[brokenRow] / xs[brokenRow])} (${clean(ys[brokenRow])} ÷ ${clean(xs[brokenRow])}).`,
+                    `The quotient isn't constant, so <strong>no — it's not proportional</strong>.`
+                  ]
+            };
+          }
+          if (v === 2) {
+            // Decide proportionality from an equation.
+            const k = pick([2, 3, 4, 5]);
+            const b = ri(1, 4);
+            const isProp = Math.random() < 0.5;
+            const eq = isProp ? `y = ${k}x` : pick([`y = ${k}x + ${b}`, `y = x + ${k}`, `y = ${k}x − ${b}`]);
+            return {
+              prompt: `Is the relationship <span class="math">${eq}</span> proportional?`,
+              type: "choice",
+              choices: ["Yes — it's a pure multiply, y = kx", "No — it adds or subtracts, so x = 0 isn't y = 0"],
+              correctIndex: isProp ? 0 : 1,
+              hints: [
+                "A proportional equation is just y = (some number) × x — nothing added on.",
+                "Try x = 0. Proportional means y has to be 0 too."
+              ],
+              steps: isProp
+                ? [
+                    `${eq} is exactly y = kx, with k = ${k} and nothing added.`,
+                    `Check: x = 0 → y = 0 ✓. <strong>Proportional.</strong>`
+                  ]
+                : [
+                    `${eq} has an extra term, so it isn't a pure multiply.`,
+                    `Check: x = 0 does not give y = 0 — so <strong>not proportional</strong>.`
+                  ]
+            };
+          }
+          // Confirmed proportional → find k and use y = kx (forward or backward).
+          const k = pick([2, 3, 4, 5]);
+          const ctx = pick([
+            { x: "hours", y: "miles", per: "miles per hour" },
+            { x: "pounds", y: "dollars", per: "dollars per pound" },
+            { x: "batches", y: "cups", per: "cups per batch" }
+          ]);
+          const x1 = ri(2, 4);
+          const y1 = x1 * k;
+          const forward = Math.random() < 0.5;
+          const x2 = ri(5, 9);
+          const y2 = x2 * k;
+          return forward
+            ? {
+                prompt: `${y1} ${ctx.y} go with ${x1} ${ctx.x}, and the relationship is proportional. How many ${ctx.y} go with ${x2} ${ctx.x}?`,
+                type: "numeric", answer: y2,
+                hints: [
+                  `First find k from the complete pair: ${y1} ÷ ${x1}.`,
+                  `Then multiply forward: k × ${x2}.`
+                ],
+                steps: [
+                  `k = y ÷ x = ${y1} ÷ ${x1} = ${k} (${ctx.per}).`,
+                  `y = kx = ${k} × ${x2} = <strong>${y2}</strong>.`
+                ]
+              }
+            : {
+                prompt: `${y1} ${ctx.y} go with ${x1} ${ctx.x}, and the relationship is proportional. How many ${ctx.x} give ${y2} ${ctx.y}?`,
+                type: "numeric", answer: x2,
+                hints: [
+                  `First find k from the complete pair: ${y1} ÷ ${x1}.`,
+                  `Then divide backward: ${y2} ÷ k.`
+                ],
+                steps: [
+                  `k = y ÷ x = ${y1} ÷ ${x1} = ${k} (${ctx.per}).`,
+                  `x = y ÷ k = ${y2} ÷ ${k} = <strong>${x2}</strong>.`
+                ]
+              };
+        }
       }
     ]
   },

@@ -1388,7 +1388,7 @@ function renderPlan() {
     <nav class="crumbs rise"><a href="#" data-home>← My garden</a> <span>/ Summer plan</span></nav>
     <header class="plan-hero rise d1">
       <span class="hero-kicker">${P.subtitle}</span>
-      <h1>${P.title} <em>· Weeks 1–2</em></h1>
+      <h1>${P.title} <em>· Weeks 1–4</em></h1>
       <div class="plan-facts">
         <span class="plan-fact">🗓️ ${P.range}</span>
         <span class="plan-fact">⏱️ ${P.cadence}</span>
@@ -1401,7 +1401,7 @@ function renderPlan() {
 
     <section class="plan-rest rise d4">
       <h3>The rest of summer</h3>
-      <p class="plan-rest-sub">Weeks 3–10 unlock the same way: Unit 4 wraps up, then proportional relationships (Unit 8), then percentages (Unit 9). We'll build these out as you reach them.</p>
+      <p class="plan-rest-sub">Weeks 5–10 unlock the same way: percentages (Unit 9), then a cumulative review. We'll build these out as you reach them.</p>
       <div class="rest-grid">
         ${P.upcoming.map(u => `
           <button class="rest-card tint-${u.unit === "u4" ? "peach" : u.unit === "u8" ? "lilac" : "honey"}" data-plan-unit="${u.unit}">
