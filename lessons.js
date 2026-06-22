@@ -1246,11 +1246,11 @@ const UNITS = [
           {
             title: "Two things growing together",
             html: `
-              <p>Picture a juice bar where smoothies are <strong>$3 each</strong>. Buy more, pay more — and you can see it line up in a table:</p>
+              <p>You order one smoothie — <strong>$3</strong>. Your friend orders two — <strong>$6</strong>. Someone grabs four for the table — <strong>$12</strong>. There's a steady rhythm hiding in those prices, and a table shows it best:</p>
               <div class="teach-visual">${htmlTable([1, 2, 3, 4], [3, 6, 9, 12], -1, "smoothies", "cost ($)")}</div>
-              <p>Notice the rhythm: every extra smoothie adds the <strong>same $3</strong>. The cost and the number of smoothies climb together at a steady rate.</p>
+              <p>Every extra smoothie adds the <strong>same $3</strong> — never more, never less. The two columns climb together in perfect step.</p>
               <div class="key-idea"><span class="tag">Key idea</span>
-                When two amounts always grow together at a steady rate like this, they're in a <strong>proportional relationship</strong>.
+                When two amounts always grow together in steady step like this, they're in a <strong>proportional relationship</strong> — the big idea behind this whole unit.
               </div>`
           },
           {
@@ -1530,10 +1530,10 @@ const UNITS = [
           {
             title: "One rule for the whole table",
             html: `
-              <p>Last lesson you found k. Now watch k do something powerful: it lets you write the <em>whole</em> relationship as one short equation.</p>
+              <p>A table is handy, but you can't list <em>every</em> number of tacos forever. Watch <span class="math">k</span> fix that — it lets you fold the whole relationship into one short equation.</p>
               <p>A food truck sells tacos for <strong>$4 each</strong>:</p>
               <div class="teach-visual">${htmlTable([1, 2, 3], [4, 8, 12], -1, "tacos", "cost ($)")}</div>
-              <p>Instead of writing out every row forever, we just say: cost = 4 × tacos. Using <span class="math">y</span> for cost and <span class="math">x</span> for tacos:</p>
+              <p>Every row is really the same move — multiply the tacos by 4. So instead of an endless table, just write cost = 4 × tacos. Using <span class="math">y</span> for cost and <span class="math">x</span> for tacos:</p>
               <div class="key-idea"><span class="tag">Key idea</span>
                 <span class="math">y = 4x</span> — that one line already knows the price of 1 taco, 7 tacos, even 100 tacos.
               </div>`
@@ -1787,9 +1787,9 @@ const UNITS = [
           {
             title: "Every proportional graph looks the same",
             html: `
-              <p>Here's a treat: graph <em>any</em> proportional relationship and you get the same shape every single time — a <strong>straight line that starts at the corner (0, 0)</strong>.</p>
+              <p>Tables and equations are great, but a picture makes proportional relationships click. Graph <em>any</em> of them and you always get the exact same shape — a <strong>straight line climbing out of the corner (0, 0)</strong>.</p>
               <div class="teach-visual">${svgGraph(2, 3)}</div>
-              <p>This is the cost of strawberries at $2 a pound: <span class="math">y = 2x</span>. The dot at (3, 6) says “3 pounds cost $6.” Every proportional graph is a straight ramp like this.</p>
+              <p>This one is strawberries at $2 a pound: <span class="math">y = 2x</span>. The dot at (3, 6) is saying “3 pounds cost $6.” Every proportional graph is a straight ramp just like it.</p>
               <div class="key-idea"><span class="tag">Key idea</span>
                 A proportional graph is a <strong>straight line</strong> through the <strong>origin (0, 0)</strong>.
               </div>`
@@ -2053,9 +2053,9 @@ const UNITS = [
           {
             title: "One idea, three costumes",
             html: `
-              <p>You've met proportional relationships three different ways now — in a <strong>table</strong>, as an <strong>equation</strong>, and on a <strong>graph</strong>. The cool part: they're all checking the exact same thing — that y is always the same steady multiple of x.</p>
+              <p>You've now met proportional relationships in three outfits — a <strong>table</strong>, an <strong>equation</strong>, and a <strong>graph</strong>. Here's the secret: underneath, they're all checking one thing — that y is always the same steady multiple of x.</p>
               <div class="teach-visual">${htmlTable([1, 2, 3], [4, 8, 12], -1, "x", "y")}</div>
-              <p>This table, the equation <span class="math">y = 4x</span>, and a straight line through (0, 0) are three pictures of the <em>same</em> relationship.</p>
+              <p>This table, the equation <span class="math">y = 4x</span>, and a straight line through (0, 0) aren't three different ideas — they're three snapshots of the <em>same</em> relationship.</p>
               <div class="key-idea"><span class="tag">Key idea</span>
                 Same k in every row · <span class="math">y = kx</span> · straight line through (0, 0). Find one, you've found them all.
               </div>`

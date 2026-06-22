@@ -1054,3 +1054,68 @@ body.dusk .toast { background: var(--sage-soft); color: var(--ink); }
 .review-done .rd-title { font-family: var(--font-display); font-weight: 560; font-size: 1.5rem; color: var(--ink); }
 .review-done p { color: var(--ink-soft); margin: 6px auto 0; max-width: 46ch; }
 .review-done .btn { margin-top: 16px; }
+
+/* ============================================================
+   Times Tables — timed drill
+   ============================================================ */
+.drill-hero { text-align: center; margin-bottom: 18px; }
+.drill-hero h1 { font-family: var(--font-display); font-weight: 560; font-size: 2rem; margin: 6px 0 4px; color: var(--ink); }
+.drill-hero .lede { max-width: 50ch; margin: 0 auto; color: var(--ink-soft); font-size: 1.02rem; }
+.drill-stats {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: 10px; margin-top: 16px;
+}
+.drill-stat {
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
+  background: var(--card); border: 1.5px solid var(--sage-soft); border-radius: var(--radius-sm);
+  padding: 8px 16px; min-width: 84px; box-shadow: var(--shadow);
+}
+.drill-stat .ds-label { font-size: .62rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); }
+.drill-stat .ds-val { font-family: var(--font-display); font-weight: 560; font-size: 1.3rem; color: var(--deep); font-variant-numeric: tabular-nums; }
+.drill-finish {
+  border: 1.5px solid var(--sage-soft); background: transparent; color: var(--ink-soft);
+  border-radius: 999px; padding: 8px 16px; font-family: var(--font-body); font-weight: 700;
+  font-size: .82rem; cursor: pointer; transition: border-color .15s, color .15s;
+}
+.drill-finish:hover { border-color: var(--peach); color: var(--ink); }
+
+.drill-card {
+  background: var(--card); border: 1.5px solid var(--sage-soft); border-radius: var(--radius);
+  box-shadow: var(--shadow-lg); padding: 26px 24px 22px; text-align: center; max-width: 480px;
+  margin: 0 auto;
+}
+.drill-timer { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.drill-timer-num {
+  font-family: var(--font-display); font-weight: 560; font-size: 1.3rem; color: var(--deep);
+  font-variant-numeric: tabular-nums; min-width: 46px; text-align: left;
+}
+.drill-timer-track { flex: 1; height: 10px; border-radius: 999px; background: var(--sage-soft); overflow: hidden; }
+.drill-timer-bar { display: block; height: 100%; width: 100%; border-radius: 999px; background: var(--sage); transition: width 1s linear, background .3s; }
+.drill-timer-bar.is-low { background: var(--peach); }
+
+.drill-question {
+  font-family: var(--font-display); font-weight: 560; font-size: 3.4rem; line-height: 1.1;
+  color: var(--ink); letter-spacing: .01em; margin: 6px 0 20px; font-variant-numeric: tabular-nums;
+}
+.drill-answer { justify-content: center; }
+.drill-answer .answer-input { max-width: 150px; text-align: center; font-size: 1.4rem; font-weight: 800; }
+.drill-feedback { min-height: 24px; margin-top: 16px; font-size: 1rem; line-height: 1.5; }
+.drill-feedback.good { color: var(--deep); }
+.drill-feedback.fix { color: var(--amber); }
+.drill-feedback.try { color: var(--rose); }
+.drill-feedback.gentle { color: var(--ink-soft); }
+.drill-feedback strong { color: var(--deep); }
+.drill-feedback.fix strong { color: var(--amber); }
+.drill-bankline { margin-top: 14px; font-size: .72rem; color: var(--ink-soft); opacity: .8; }
+
+.drill-summary { text-align: center; }
+.drill-summary .ds-big {
+  font-family: var(--font-display); font-weight: 560; font-size: 3rem; color: var(--deep);
+  margin: 0; font-variant-numeric: tabular-nums;
+}
+.drill-summary .ds-sub { color: var(--ink-soft); font-weight: 700; margin: 2px 0 0; }
+.drill-summary-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 20px; }
+@media (max-width: 480px) {
+  .drill-question { font-size: 2.8rem; }
+  .drill-hero h1 { font-size: 1.7rem; }
+}

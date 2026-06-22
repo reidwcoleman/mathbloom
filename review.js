@@ -1,21 +1,18 @@
 /* ============================================================
    MathBloom — "Lessons to work on before next session"
-   Two focused review lessons that live right under the hero:
-     1. Multiplication  (multi-digit, decimals, fractions)
-     2. Division        (whole numbers, decimals, fractions)
-   Each lesson = a clear recap + 3 warm-ups + 10 practice problems.
+   Two practice lessons that live right under the hero:
+     1. Times Tables (×1–12)  — a 15-minute timed drill
+     2. Week 3 Recap          — 15 mixed problems from
+                                u8l1 (Tables & k) + u8l2 (y = kx)
    Self-contained: reuses the app's CSS + the global go()/view/renderHome.
    ============================================================ */
 
 (function () {
   "use strict";
 
-  const RKEY = "mathbloom-review-v2";
+  const RKEY = "mathbloom-review-v3";
 
-  // display order / numbering for the two lessons
-  const LNUM = { mult: 1, div: 2 };
-
-  // ---- progress for the review section (separate from lesson garden) ----
+  // ---- progress (only the recap tracks per-question progress) ----
   function loadReview() {
     try { return JSON.parse(localStorage.getItem(RKEY)) || {}; }
     catch { return {}; }
@@ -23,7 +20,7 @@
   function saveReview(r) {
     try { localStorage.setItem(RKEY, JSON.stringify(r)); } catch (e) {}
   }
-  let rdone = loadReview(); // { lessonKey: { "w0":true, "p3":true, ... } }
+  let rdone = loadReview(); // { lessonKey: { "p3": true, ... } }
 
   function markDone(key, qid) {
     if (!rdone[key]) rdone[key] = {};
@@ -34,308 +31,6 @@
     return rdone[key] ? Object.keys(rdone[key]).length : 0;
   }
 
-  // ---- array model: rows × cols squares -> a product (multiplication recap) ----
-  function svgArrayModel(rows, cols) {
-    const u = 24, padL = 16, padT = 14;
-    const gridW = cols * u, gridH = rows * u;
-    const totalW = padL * 2 + gridW;
-    const totalH = padT + gridH + 30;
-    let cells = "";
-    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
-      cells += `<rect x="${padL + c * u + 2}" y="${padT + r * u + 2}" width="${u - 4}" height="${u - 4}" rx="4" fill="#FBE3D4" stroke="#C9703F" stroke-width="1.5"/>`;
-    }
-    return `
-    <svg viewBox="0 0 ${totalW} ${totalH}" width="${Math.min(totalW, 300)}" role="img" aria-label="${rows} rows of ${cols} squares make ${rows * cols} in all">
-      ${cells}
-      <text x="${totalW / 2}" y="${totalH - 8}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="800" font-size="13" fill="#3E6B4F">${rows} × ${cols} = ${rows * cols}</text>
-    </svg>`;
-  }
-
-  // ---- groups model: a total shared into equal groups (division recap) ----
-  function svgGroupsModel(total, groups) {
-    const per = total / groups;
-    const r = 7, gap = 6, padX = 14, padY = 14, cols = 2;
-    const rows = Math.ceil(per / cols);
-    const groupW = cols * (2 * r + gap) + 8;
-    const groupH = rows * (2 * r + gap) + 8;
-    const totalW = padX + groups * (groupW + 12);
-    const totalH = padY + groupH + 28;
-    let g = "";
-    for (let gi = 0; gi < groups; gi++) {
-      const gx = padX + gi * (groupW + 12);
-      g += `<rect x="${gx}" y="${padY}" width="${groupW}" height="${groupH}" rx="12" fill="#EEF4EE" stroke="#3E6B4F" stroke-width="1.6"/>`;
-      for (let d = 0; d < per; d++) {
-        const dc = d % cols, dr = Math.floor(d / cols);
-        const cx = gx + 4 + r + dc * (2 * r + gap);
-        const cy = padY + 4 + r + dr * (2 * r + gap);
-        g += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#FBE3D4" stroke="#C9703F" stroke-width="1.4"/>`;
-      }
-    }
-    return `
-    <svg viewBox="0 0 ${totalW} ${totalH}" width="${Math.min(totalW, 340)}" role="img" aria-label="${total} shared into ${groups} groups of ${per}">
-      ${g}
-      <text x="${totalW / 2}" y="${totalH - 7}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="800" font-size="13" fill="#3E6B4F">${total} ÷ ${groups} = ${per}</text>
-    </svg>`;
-  }
-
-  // ============================================================
-  //  DATA — two lessons
-  //  Each problem: { prompt, answer, unit?, hint, steps }
-  // ============================================================
-  const LESSONS = {
-    mult: {
-      key: "mult",
-      emoji: "✖️",
-      title: "Multiplication",
-      blurb: "Multi-digit, decimals, and fractions — the same moves, every time.",
-      recap: `
-        <p><strong>Multiplication</strong> is fast repeated adding — equal groups joined together. The
-        array below is 4 rows of 6, the same as 6 + 6 + 6 + 6 = <strong>24</strong>.</p>
-        <div class="recap-visual">${svgArrayModel(4, 6)}</div>
-        <p>For bigger whole numbers, split each one into its place values, multiply the parts, and add them:
-        <span class="math">14 × 5 = (10 × 5) + (4 × 5) = 50 + 20 = 70</span>. The two cases people forget are
-        decimals and fractions — so here they are, step by step.</p>
-
-        <h3 class="recap-sub">🔢 Multiplying with decimals</h3>
-        <p>The trick: multiply as if the points weren't there, then put the point back at the very end.</p>
-        <div class="recap-walk">
-          <span class="rw-head">Three steps</span>
-          <ol>
-            <li>Ignore the decimal points and multiply the numbers like ordinary whole numbers.</li>
-            <li>Count how many digits sit <strong>after</strong> a point — in <strong>both</strong> numbers, added together.</li>
-            <li>Put that many decimal places in your answer, counting from the right.</li>
-          </ol>
-        </div>
-        <div class="recap-eg"><span class="rr-tag">Worked example — 0.6 × 0.4</span>
-          <strong>Step 1:</strong> 6 × 4 = 24. <strong>Step 2:</strong> 0.6 has 1 digit after the point and
-          0.4 has 1, so 2 in all. <strong>Step 3:</strong> count 2 places from the right of 24 →
-          <strong>0.24</strong>.</div>
-        <p class="recap-tip">Sense check: multiplying by a number <em>less than 1</em> makes the result
-        smaller than what you started with. 0.4 is less than 1, and sure enough 0.24 is smaller than 0.6. ✓</p>
-
-        <h3 class="recap-sub">🍰 Multiplying with fractions</h3>
-        <p>Fractions are friendlier than they look here — no common denominator needed. Just go straight across.</p>
-        <div class="recap-walk">
-          <span class="rw-head">Two steps</span>
-          <ol>
-            <li>Multiply the <strong>tops</strong> (the numerators) to get the new top.</li>
-            <li>Multiply the <strong>bottoms</strong> (the denominators) to get the new bottom — then simplify.</li>
-          </ol>
-        </div>
-        <p>A whole number is just a fraction over 1, so <span class="math">8 = 8/1</span>. And the word
-        <strong>“of”</strong> means multiply — <em>½ of 8</em> is <span class="math">½ × 8 = 4</span>.</p>
-        <div class="recap-eg"><span class="rr-tag">Worked example — ¾ × 8</span>
-          Write 8 as 8/1. <strong>Tops:</strong> 3 × 8 = 24. <strong>Bottoms:</strong> 4 × 1 = 4.
-          That gives 24/4, and 24 ÷ 4 = <strong>6</strong>.</div>`,
-      warmups: [
-        { prompt: `What is <strong>7 × 8</strong>?`,
-          answer: 56,
-          hint: `Seven groups of eight — or just recall the times table.`,
-          steps: [`7 × 8 = <strong>56</strong>.`] },
-        { prompt: `What is <strong>23 × 3</strong>?`,
-          answer: 69,
-          hint: `Split it: 20 × 3 and 3 × 3, then add.`,
-          steps: [`20 × 3 = 60 and 3 × 3 = 9.`, `60 + 9 = <strong>69</strong>.`] },
-        { prompt: `What is <strong>0.2 × 4</strong>?`,
-          answer: 0.8,
-          hint: `Multiply 2 × 4, then place one decimal point.`,
-          steps: [`Ignore the point: 2 × 4 = 8.`, `One decimal place → <strong>0.8</strong>.`] },
-      ],
-      practice: [
-        { prompt: `What is <strong>14 × 5</strong>?`,
-          answer: 70,
-          hint: `10 × 5 and 4 × 5, then add.`,
-          steps: [`10 × 5 = 50 and 4 × 5 = 20.`, `50 + 20 = <strong>70</strong>.`] },
-        { prompt: `What is <strong>26 × 4</strong>?`,
-          answer: 104,
-          hint: `20 × 4 and 6 × 4.`,
-          steps: [`20 × 4 = 80 and 6 × 4 = 24.`, `80 + 24 = <strong>104</strong>.`] },
-        { prompt: `What is <strong>13 × 12</strong>?`,
-          answer: 156,
-          hint: `13 × 10, then 13 × 2.`,
-          steps: [`13 × 10 = 130 and 13 × 2 = 26.`, `130 + 26 = <strong>156</strong>.`] },
-        { prompt: `What is <strong>0.3 × 7</strong>?`,
-          answer: 2.1,
-          hint: `3 × 7 = 21, then one decimal place.`,
-          steps: [`3 × 7 = 21.`, `One decimal place → <strong>2.1</strong>.`] },
-        { prompt: `What is <strong>0.6 × 0.4</strong>?`,
-          answer: 0.24,
-          hint: `6 × 4 = 24, then count the decimal places.`,
-          steps: [`6 × 4 = 24.`, `Two decimal places in all → <strong>0.24</strong>.`] },
-        { prompt: `What is <strong>2.5 × 4</strong>?`,
-          answer: 10,
-          hint: `25 × 4 = 100, then place one decimal point.`,
-          steps: [`25 × 4 = 100.`, `One decimal place → 10.0 = <strong>10</strong>.`] },
-        { prompt: `What is <strong>1.2 × 1.5</strong>?`,
-          answer: 1.8,
-          hint: `12 × 15 = 180, then two decimal places.`,
-          steps: [`12 × 15 = 180.`, `Two decimal places → <strong>1.8</strong>.`] },
-        { prompt: `What is <strong>¾ × 8</strong>?`,
-          answer: 6,
-          hint: `Top × top over bottom: (3 × 8) ÷ 4.`,
-          steps: [`¾ × 8 = (3 × 8)/4 = 24/4.`, `24 ÷ 4 = <strong>6</strong>.`] },
-        { prompt: `What is <strong>⅔ × 9</strong>?`,
-          answer: 6,
-          hint: `(2 × 9) ÷ 3.`,
-          steps: [`⅔ × 9 = 18/3.`, `18 ÷ 3 = <strong>6</strong>.`] },
-        { prompt: `What is <strong>125 × 8</strong>?`,
-          answer: 1000,
-          hint: `A classic: 125 × 8 fills out to a round number.`,
-          steps: [`125 × 8 = <strong>1000</strong>.`] },
-      ],
-    },
-
-    div: {
-      key: "div",
-      emoji: "➗",
-      title: "Division",
-      blurb: "Split into equal groups — and flip when you divide by a fraction.",
-      recap: `
-        <p><strong>Division</strong> splits an amount into equal groups, and it always <em>undoes</em>
-        multiplication: 12 ÷ 3 = 4 because 4 × 3 = 12. Below, 12 dots share evenly into 3 groups of 4.</p>
-        <div class="recap-visual">${svgGroupsModel(12, 3)}</div>
-        <p>The number being split (12) is the <strong>dividend</strong>; the number you divide by (3) is the
-        <strong>divisor</strong>. Two cases trip people up — decimals and fractions — so here they are in full.</p>
-
-        <h3 class="recap-sub">🔢 Dividing with decimals</h3>
-        <p>If only the number being split has a decimal, just divide and keep the point lined up:
-        <span class="math">4.8 ÷ 2 = 2.4</span>. The tricky case is dividing <strong>by</strong> a decimal — fix
-        it by turning the divisor into a whole number first.</p>
-        <div class="recap-walk">
-          <span class="rw-head">Three steps</span>
-          <ol>
-            <li>Slide the divisor's point to the right until it's a whole number — count how many places.</li>
-            <li>Slide the dividend's point to the right the <strong>same</strong> number of places.</li>
-            <li>Divide. The answer is unchanged, because you scaled both numbers the same way.</li>
-          </ol>
-        </div>
-        <div class="recap-eg"><span class="rr-tag">Worked example — 7.2 ÷ 0.8</span>
-          The divisor 0.8 needs <strong>1</strong> slide to become 8. Slide 7.2 once too → 72.
-          Now <span class="math">72 ÷ 8 = 9</span>.</div>
-        <p class="recap-tip">Sense check: dividing by a number <em>less than 1</em> makes the answer
-        bigger. 7.2 ÷ 0.8 = 9, which is larger than 7.2. ✓</p>
-
-        <h3 class="recap-sub">🍰 Dividing by a fraction — “keep · change · flip”</h3>
-        <p>You can't divide by a fraction directly, so you multiply by its <strong>reciprocal</strong> (its flip).
-        Picture it: dividing by ½ asks “how many halves fit?” Halves are small, so lots of them fit — that's
-        why the answer gets bigger, not smaller.</p>
-        <div class="recap-walk">
-          <span class="rw-head">Keep · change · flip</span>
-          <ol>
-            <li><strong>Keep</strong> the first fraction exactly as it is.</li>
-            <li><strong>Change</strong> the ÷ sign into a × sign.</li>
-            <li><strong>Flip</strong> the second fraction upside down — then multiply tops and bottoms.</li>
-          </ol>
-        </div>
-        <p>A whole number flips too — <span class="math">8 = 8/1</span> flips to <span class="math">1/8</span>.</p>
-        <div class="recap-eg"><span class="rr-tag">Worked example — ¾ ÷ ⅛</span>
-          Keep ¾. Change ÷ to ×. Flip ⅛ → 8/1. Now ¾ × 8 = 24/4 = <strong>6</strong>.
-          (It checks out: ¾ is the same as 6 eighths, so exactly 6 eighths fit.)</div>`,
-      warmups: [
-        { prompt: `What is <strong>24 ÷ 6</strong>?`,
-          answer: 4,
-          hint: `What number times 6 makes 24?`,
-          steps: [`6 × 4 = 24, so 24 ÷ 6 = <strong>4</strong>.`] },
-        { prompt: `What is <strong>56 ÷ 7</strong>?`,
-          answer: 8,
-          hint: `What number times 7 makes 56?`,
-          steps: [`7 × 8 = 56, so 56 ÷ 7 = <strong>8</strong>.`] },
-        { prompt: `What is <strong>4.8 ÷ 2</strong>?`,
-          answer: 2.4,
-          hint: `Halve it. 48 ÷ 2 = 24, then place the point.`,
-          steps: [`48 ÷ 2 = 24.`, `Keep one decimal place → <strong>2.4</strong>.`] },
-      ],
-      practice: [
-        { prompt: `What is <strong>72 ÷ 8</strong>?`,
-          answer: 9,
-          hint: `8 × ? = 72.`,
-          steps: [`8 × 9 = 72, so <strong>9</strong>.`] },
-        { prompt: `What is <strong>84 ÷ 6</strong>?`,
-          answer: 14,
-          hint: `60 ÷ 6 and 24 ÷ 6.`,
-          steps: [`60 ÷ 6 = 10 and 24 ÷ 6 = 4.`, `10 + 4 = <strong>14</strong>.`] },
-        { prompt: `What is <strong>96 ÷ 4</strong>?`,
-          answer: 24,
-          hint: `80 ÷ 4 and 16 ÷ 4.`,
-          steps: [`80 ÷ 4 = 20 and 16 ÷ 4 = 4.`, `20 + 4 = <strong>24</strong>.`] },
-        { prompt: `What is <strong>144 ÷ 12</strong>?`,
-          answer: 12,
-          hint: `12 × ? = 144.`,
-          steps: [`12 × 12 = 144, so <strong>12</strong>.`] },
-        { prompt: `What is <strong>6.5 ÷ 5</strong>?`,
-          answer: 1.3,
-          hint: `65 ÷ 5 = 13, then place the point.`,
-          steps: [`65 ÷ 5 = 13.`, `Keep one decimal place → <strong>1.3</strong>.`] },
-        { prompt: `What is <strong>9.6 ÷ 3</strong>?`,
-          answer: 3.2,
-          hint: `96 ÷ 3 = 32, then place the point.`,
-          steps: [`96 ÷ 3 = 32.`, `One decimal place → <strong>3.2</strong>.`] },
-        { prompt: `What is <strong>7.2 ÷ 0.8</strong>?`,
-          answer: 9,
-          hint: `Slide both points one place: 72 ÷ 8.`,
-          steps: [`Make the divisor whole: 7.2 ÷ 0.8 = 72 ÷ 8.`, `72 ÷ 8 = <strong>9</strong>.`] },
-        { prompt: `What is <strong>½ ÷ ¼</strong>?`,
-          answer: 2,
-          hint: `Keep · change · flip: ½ × 4.`,
-          steps: [`½ ÷ ¼ = ½ × 4/1 = 4/2.`, `4 ÷ 2 = <strong>2</strong>.`] },
-        { prompt: `What is <strong>¾ ÷ ⅛</strong>?`,
-          answer: 6,
-          hint: `Keep ¾, flip ⅛ to 8, then multiply.`,
-          steps: [`¾ ÷ ⅛ = ¾ × 8 = 24/4.`, `24 ÷ 4 = <strong>6</strong>.`] },
-        { prompt: `What is <strong>100 ÷ 8</strong>?`,
-          answer: 12.5,
-          hint: `8 × 12 = 96, with 4 left over → a half.`,
-          steps: [`8 × 12 = 96, remainder 4.`, `4 ÷ 8 = 0.5, so <strong>12.5</strong>.`] },
-      ],
-    },
-  };
-
-  // ============================================================
-  //  HOME CARD — injected under the hero
-  // ============================================================
-  function homeCardHTML() {
-    const card = (l) => {
-      const total = l.warmups.length + l.practice.length;
-      const done = doneCount(l.key);
-      const pct = Math.round((done / total) * 100);
-      const complete = done >= total;
-      return `
-        <button class="review-card ${complete ? "is-complete" : ""}" data-review="${l.key}">
-          <span class="rc-emoji">${l.emoji}</span>
-          <span class="rc-body">
-            <span class="rc-kicker">Lesson ${LNUM[l.key]}${complete ? " • done 🌸" : ""}</span>
-            <h3>${l.title}</h3>
-            <p>${l.blurb}</p>
-            <span class="rc-bar"><span class="rc-bar-fill" style="width:${pct}%"></span></span>
-            <span class="rc-count">${done} / ${total} done · recap + ${l.warmups.length} warm-ups + ${l.practice.length} practice</span>
-          </span>
-          <span class="rc-go">→</span>
-        </button>`;
-    };
-    return `
-      <section class="review-home rise d1" aria-label="Lessons to work on before next session">
-        <div class="review-home-head">
-          <h2>Lessons to work on before next session</h2>
-          <p>Two quick refreshers. Read the recap, ease in with the warm-ups, then grow through the practice. No rush. 🌱</p>
-        </div>
-        <div class="review-cards">
-          ${card(LESSONS.mult)}
-          ${card(LESSONS.div)}
-        </div>
-      </section>`;
-  }
-
-  function wireHome(root) {
-    root.querySelectorAll("[data-review]").forEach(b =>
-      b.addEventListener("click", () => {
-        if (typeof go === "function") go(() => renderReview(b.dataset.review));
-        else renderReview(b.dataset.review);
-      }));
-  }
-
-  // ============================================================
-  //  LESSON PAGE
-  // ============================================================
   function parseNum(raw) {
     let s = String(raw).trim().replace(/[$,%]/g, "").replace(/\s+/g, "");
     if (!s) return NaN;
@@ -346,6 +41,333 @@
     }
     return Number(s);
   }
+
+  const PRAISE = ["Correct!", "Yes!", "Nailed it.", "Beautiful.", "That's it.", "Right on.", "Lovely work."];
+  function pickPraise() { return PRAISE[Math.floor(Math.random() * PRAISE.length)]; }
+
+  function goHome() {
+    if (typeof go === "function") go(renderHome); else renderHome();
+  }
+
+  // ============================================================
+  //  1) TIMES TABLES — a 15-minute timed drill (×1–12)
+  // ============================================================
+  const DRILL = {
+    sessionMin: 15,      // total practice time
+    perQuestionSec: 15,  // time limit per question
+    bankSize: 1000,      // size of the question word bank
+    maxFactor: 12,       // factors 1 … 12
+  };
+
+  // Build a word bank of 1000 questions, each a pair of factors 1–12.
+  function buildBank() {
+    const bank = [];
+    for (let i = 0; i < DRILL.bankSize; i++) {
+      const a = 1 + Math.floor(Math.random() * DRILL.maxFactor);
+      const b = 1 + Math.floor(Math.random() * DRILL.maxFactor);
+      bank.push([a, b]);
+    }
+    return bank;
+  }
+
+  function fmtClock(ms) {
+    const s = Math.max(0, Math.round(ms / 1000));
+    const m = Math.floor(s / 60);
+    return m + ":" + String(s % 60).padStart(2, "0");
+  }
+
+  // module-scoped timers so navigating away can never leave one ticking
+  let drillQTimer = null, drillSessTimer = null;
+  function clearDrillTimers() {
+    if (drillQTimer) { clearInterval(drillQTimer); drillQTimer = null; }
+    if (drillSessTimer) { clearInterval(drillSessTimer); drillSessTimer = null; }
+  }
+
+  function renderTimesDrill() {
+    clearDrillTimers();
+    const view = document.getElementById("view");
+    const bank = buildBank();
+
+    let idx = 0;
+    let attempted = 0, firstTry = 0;
+    let qLeft = DRILL.perQuestionSec;
+    let cur = null;
+    let phase = "ask"; // ask → fix → done
+    const sessionEndAt = Date.now() + DRILL.sessionMin * 60 * 1000;
+
+    view.innerHTML = `
+      <nav class="crumbs rise"><a href="#" data-home>← My garden</a> <span>/ Before next session</span> <span>/ Times Tables</span></nav>
+
+      <header class="drill-hero rise d1">
+        <span class="hero-kicker">Practice 1 · timed drill · ×1–12</span>
+        <h1>✖️ Times Tables Drill</h1>
+        <p class="lede">Fifteen minutes of quick facts, fifteen seconds each. Miss one and you'll type the right answer before moving on — that's how it locks in. 🌱</p>
+        <div class="drill-stats">
+          <span class="drill-stat"><span class="ds-label">Time left</span><span class="ds-val" id="drillClock">${DRILL.sessionMin}:00</span></span>
+          <span class="drill-stat"><span class="ds-label">Answered</span><span class="ds-val" id="drillAnswered">0</span></span>
+          <span class="drill-stat"><span class="ds-label">First-try&nbsp;✓</span><span class="ds-val" id="drillCorrect">0</span></span>
+          <button class="drill-finish" id="drillFinish">Finish early</button>
+        </div>
+      </header>
+
+      <section class="drill-card rise d2">
+        <div class="drill-timer">
+          <span class="drill-timer-num" id="drillTimerNum">${DRILL.perQuestionSec}s</span>
+          <span class="drill-timer-track"><span class="drill-timer-bar" id="drillTimerBar"></span></span>
+        </div>
+        <div class="drill-question" id="drillQ">— × —</div>
+        <div class="answer-row drill-answer">
+          <input class="answer-input" id="drillInput" type="text" inputmode="numeric" pattern="[0-9]*"
+            placeholder="answer" autocomplete="off" aria-label="Your answer">
+          <button class="btn btn-primary" id="drillSubmit">Check</button>
+          <button class="btn btn-primary" id="drillContinue" style="display:none">Continue →</button>
+        </div>
+        <div class="drill-feedback" id="drillFeedback"></div>
+        <p class="drill-bankline">Drawing from a 1,000-question times-table bank.</p>
+      </section>`;
+
+    const el = id => document.getElementById(id);
+    const els = {
+      clock: el("drillClock"), answered: el("drillAnswered"), correct: el("drillCorrect"),
+      q: el("drillQ"), timerNum: el("drillTimerNum"), timerBar: el("drillTimerBar"),
+      input: el("drillInput"), submit: el("drillSubmit"), cont: el("drillContinue"),
+      feedback: el("drillFeedback"),
+    };
+    const answerOf = () => cur[0] * cur[1];
+    const aliveOrStop = () => {
+      if (document.body.contains(els.clock)) return true;
+      clearDrillTimers(); // we've navigated away — stop ticking
+      return false;
+    };
+
+    // ---- session countdown (whole drill) ----
+    drillSessTimer = setInterval(() => {
+      if (!aliveOrStop()) return;
+      const left = sessionEndAt - Date.now();
+      els.clock.textContent = fmtClock(left);
+      if (left <= 0) endSession();
+    }, 250);
+
+    function drawTimer() {
+      els.timerNum.textContent = qLeft + "s";
+      els.timerBar.style.width = (qLeft / DRILL.perQuestionSec * 100) + "%";
+      els.timerBar.classList.toggle("is-low", qLeft <= 5);
+    }
+    function startQTimer() {
+      if (drillQTimer) clearInterval(drillQTimer);
+      drillQTimer = setInterval(() => {
+        if (!aliveOrStop()) return;
+        qLeft--;
+        drawTimer();
+        if (qLeft <= 0) { clearInterval(drillQTimer); drillQTimer = null; timeUp(); }
+      }, 1000);
+    }
+
+    function nextQuestion() {
+      if (Date.now() >= sessionEndAt) return endSession();
+      cur = bank[idx % bank.length]; idx++;
+      phase = "ask";
+      qLeft = DRILL.perQuestionSec;
+      els.q.textContent = cur[0] + " × " + cur[1];
+      els.input.value = "";
+      els.input.disabled = false;
+      els.input.placeholder = "answer";
+      els.submit.style.display = "";
+      els.submit.disabled = false;
+      els.cont.style.display = "none";
+      els.feedback.className = "drill-feedback";
+      els.feedback.textContent = "";
+      drawTimer();
+      startQTimer();
+      els.input.focus();
+    }
+
+    function submit() {
+      if (phase === "ask") {
+        const val = parseInt(els.input.value, 10);
+        if (isNaN(val)) {
+          els.feedback.className = "drill-feedback gentle";
+          els.feedback.textContent = "Type a number, then Check.";
+          els.input.focus();
+          return;
+        }
+        if (drillQTimer) { clearInterval(drillQTimer); drillQTimer = null; }
+        attempted++;
+        if (val === answerOf()) { firstTry++; markRight(); }
+        else enterFix(false);
+      } else if (phase === "fix") {
+        const val = parseInt(els.input.value, 10);
+        if (val === answerOf()) reachedFixed();
+        else {
+          els.feedback.className = "drill-feedback try";
+          els.feedback.innerHTML = `Almost — type <strong>${answerOf()}</strong> to keep going.`;
+          els.input.select();
+        }
+      }
+    }
+
+    function timeUp() {
+      if (phase !== "ask") return;
+      attempted++;
+      enterFix(true);
+    }
+
+    function markRight() {
+      phase = "done";
+      els.feedback.className = "drill-feedback good";
+      els.feedback.innerHTML = `<strong>${pickPraise()}</strong> &nbsp;${cur[0]} × ${cur[1]} = ${answerOf()} 🌸`;
+      showContinue();
+    }
+
+    function enterFix(timedOut) {
+      phase = "fix";
+      const a = answerOf();
+      els.feedback.className = "drill-feedback fix";
+      els.feedback.innerHTML = `${timedOut ? "⏰ Time's up! " : "Not quite. "}<strong>${cur[0]} × ${cur[1]} = ${a}</strong>. Type <strong>${a}</strong> to continue.`;
+      els.input.value = "";
+      els.input.disabled = false;
+      els.input.placeholder = "type " + a;
+      els.input.focus();
+      els.timerBar.classList.remove("is-low");
+    }
+
+    function reachedFixed() {
+      phase = "done";
+      els.feedback.className = "drill-feedback good";
+      els.feedback.innerHTML = `Got it — ${cur[0]} × ${cur[1]} = ${answerOf()}. That one's sticking now. 🌱`;
+      showContinue();
+    }
+
+    function showContinue() {
+      els.input.disabled = true;
+      els.submit.style.display = "none";
+      els.cont.style.display = "";
+      els.answered.textContent = attempted;
+      els.correct.textContent = firstTry;
+      els.cont.focus();
+    }
+
+    function endSession() {
+      clearDrillTimers();
+      const pct = attempted ? Math.round(firstTry / attempted * 100) : 0;
+      view.innerHTML = `
+        <nav class="crumbs rise"><a href="#" data-home>← My garden</a> <span>/ Before next session</span> <span>/ Times Tables</span></nav>
+        <header class="review-hero rise d1">
+          <span class="hero-kicker">Practice 1 · complete</span>
+          <h1>✖️ Nice drilling!</h1>
+          <p class="lede">Your fifteen minutes are up — every fact you typed out is one that's sticking.</p>
+        </header>
+        <section class="recap-card rise d2 drill-summary">
+          <p class="ds-big">${firstTry} / ${attempted}</p>
+          <p class="ds-sub">first-try correct${attempted ? ` &nbsp;·&nbsp; ${pct}%` : ""}</p>
+          <div class="drill-summary-actions">
+            <button class="btn btn-primary" id="drillAgain">Practice again</button>
+            <button class="btn btn-ghost" id="drillBack">← Back to my garden</button>
+          </div>
+        </section>`;
+      const home = view.querySelector("[data-home]");
+      if (home) home.addEventListener("click", e => { e.preventDefault(); goHome(); });
+      const again = view.querySelector("#drillAgain");
+      if (again) again.addEventListener("click", () => {
+        if (typeof go === "function") go(renderTimesDrill); else renderTimesDrill();
+      });
+      const back = view.querySelector("#drillBack");
+      if (back) back.addEventListener("click", goHome);
+      window.scrollTo({ top: 0 });
+    }
+
+    // ---- wire ----
+    view.querySelector("[data-home]").addEventListener("click", e => {
+      e.preventDefault(); clearDrillTimers(); goHome();
+    });
+    els.submit.addEventListener("click", submit);
+    els.cont.addEventListener("click", nextQuestion);
+    els.input.addEventListener("keydown", e => {
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+      if (phase === "done") nextQuestion(); else submit();
+    });
+    el("drillFinish").addEventListener("click", endSession);
+
+    nextQuestion();
+    window.scrollTo({ top: 0 });
+  }
+
+  // ============================================================
+  //  2) WEEK 3 RECAP — 15 mixed problems (u8l1 + u8l2)
+  //  Each problem: { prompt, answer, unit?, hint, steps }
+  // ============================================================
+  const LESSONS = {
+    w3recap: {
+      key: "w3recap",
+      emoji: "🔁",
+      title: "Week 3 Recap",
+      blurb: "Fifteen mixed problems from Tables & the Constant of Proportionality and Equations y = kx.",
+      intro: `A quick mixed set from this week's two lessons — finding <span class="math">k</span> from tables, what <span class="math">k</span> means, filling gaps, and running the equation <span class="math">y = kx</span> forward and backward. Type your answer and press Check. Hints and steps are always free. 🌱`,
+      practice: [
+        { prompt: `5 movie tickets cost <strong>$20</strong>. What is <span class="math">k</span>, the cost of one ticket?`,
+          answer: 4, unit: "$",
+          hint: `k = total ÷ how many = 20 ÷ 5.`,
+          steps: [`k = y ÷ x = 20 ÷ 5 = <strong>4</strong>.`, `Each ticket costs $4.`] },
+        { prompt: `Apples cost a steady price: <strong>3 pounds for $9</strong>. What is <span class="math">k</span> (dollars per pound)?`,
+          answer: 3, unit: "$/lb",
+          hint: `Divide cost ÷ pounds.`,
+          steps: [`k = 9 ÷ 3 = <strong>3</strong>.`, `Apples are $3 a pound.`] },
+        { prompt: `Smoothies are <strong>$3 each</strong>. What do <strong>7</strong> smoothies cost?`,
+          answer: 21, unit: "$",
+          hint: `Multiply the price of one by how many: 3 × 7.`,
+          steps: [`Total = k × x = 3 × 7 = <strong>21</strong>.`] },
+        { prompt: `A car drives a steady speed: <strong>60 miles in 2 hours</strong>. What is <span class="math">k</span> (miles per hour)?`,
+          answer: 30, unit: "mph",
+          hint: `k = miles ÷ hours.`,
+          steps: [`k = 60 ÷ 2 = <strong>30</strong> miles per hour.`] },
+        { prompt: `At <strong>30 miles per hour</strong>, how far do you go in <strong>5 hours</strong>?`,
+          answer: 150, unit: "miles",
+          hint: `Distance = speed × time = 30 × 5.`,
+          steps: [`y = kx = 30 × 5 = <strong>150 miles</strong>.`] },
+        { prompt: `A proportional table shows <strong>4 → 12</strong>. What value is paired with <strong>9</strong>?`,
+          answer: 27,
+          hint: `First find k = 12 ÷ 4, then multiply by 9.`,
+          steps: [`k = 12 ÷ 4 = 3.`, `9 × 3 = <strong>27</strong>.`] },
+        { prompt: `Use the equation <span class="math">y = 6x</span>. Find <span class="math">y</span> when <span class="math">x = 8</span>.`,
+          answer: 48,
+          hint: `Forward direction — multiply.`,
+          steps: [`y = 6 × 8 = <strong>48</strong>.`] },
+        { prompt: `Use <span class="math">y = 4x</span>. If <span class="math">y = 36</span>, find <span class="math">x</span>.`,
+          answer: 9,
+          hint: `Backward direction — divide: 36 ÷ 4.`,
+          steps: [`36 = 4x, so x = 36 ÷ 4 = <strong>9</strong>.`] },
+        { prompt: `A printer prints <strong>6 pages a minute</strong>, so <span class="math">y = 6x</span>. How many pages in <strong>9 minutes</strong>?`,
+          answer: 54, unit: "pages",
+          hint: `Forward — multiply 6 × 9.`,
+          steps: [`y = 6 × 9 = <strong>54 pages</strong>.`] },
+        { prompt: `<strong>8 markers</strong> cost <strong>$24</strong>. What is <span class="math">k</span>, the cost of one marker?`,
+          answer: 3, unit: "$",
+          hint: `k = 24 ÷ 8.`,
+          steps: [`k = 24 ÷ 8 = <strong>3</strong>. Each marker is $3.`] },
+        { prompt: `Maria reads <strong>90 words in 3 minutes</strong>. What is <span class="math">k</span> (words per minute)?`,
+          answer: 30, unit: "wpm",
+          hint: `k = words ÷ minutes = 90 ÷ 3.`,
+          steps: [`k = 90 ÷ 3 = <strong>30</strong> words per minute.`] },
+        { prompt: `At <strong>30 words per minute</strong>, how many words in <strong>10 minutes</strong>?`,
+          answer: 300, unit: "words",
+          hint: `Multiply 30 × 10.`,
+          steps: [`y = kx = 30 × 10 = <strong>300 words</strong>.`] },
+        { prompt: `A proportional table shows <strong>2 → 10</strong>. What is <span class="math">k</span>?`,
+          answer: 5,
+          hint: `k = y ÷ x = 10 ÷ 2.`,
+          steps: [`k = 10 ÷ 2 = <strong>5</strong>.`] },
+        { prompt: `Tacos are <strong>$4 each</strong> (<span class="math">y = 4x</span>). You spent <strong>$36</strong>. How many tacos?`,
+          answer: 9, unit: "tacos",
+          hint: `Backward — divide: 36 ÷ 4.`,
+          steps: [`36 = 4x, so x = 36 ÷ 4 = <strong>9 tacos</strong>.`] },
+        { prompt: `Use <span class="math">y = 7x</span>. Find <span class="math">y</span> when <span class="math">x = 6</span>.`,
+          answer: 42,
+          hint: `Forward — multiply 7 × 6.`,
+          steps: [`y = 7 × 6 = <strong>42</strong>.`] },
+      ],
+    },
+  };
 
   function qCardHTML(l, q, qid, label) {
     const solved = !!(rdone[l.key] && rdone[l.key][qid]);
@@ -374,13 +396,14 @@
     const l = LESSONS[key];
     if (!l) { if (typeof renderHome === "function") return renderHome(); return; }
     const view = document.getElementById("view");
-    const total = l.warmups.length + l.practice.length;
+    const warmups = l.warmups || [];
+    const total = warmups.length + l.practice.length;
 
     view.innerHTML = `
       <nav class="crumbs rise"><a href="#" data-home>← My garden</a> <span>/ Before next session</span> <span>/ ${l.title}</span></nav>
 
       <header class="review-hero rise d1">
-        <span class="hero-kicker">Lesson ${LNUM[key]} • before next session</span>
+        <span class="hero-kicker">Practice 2 · before next session</span>
         <h1>${l.emoji} ${l.title}</h1>
         <p class="lede">${l.blurb}</p>
         <div class="review-progress">
@@ -389,31 +412,24 @@
         </div>
       </header>
 
-      <section class="recap-card rise d2">
-        <span class="recap-tag">📖 Recap — how to find it</span>
-        ${l.recap}
-      </section>
+      ${l.intro ? `<section class="recap-card rise d2"><span class="recap-tag">📖 What this covers</span><p>${l.intro}</p></section>` : ""}
 
+      ${warmups.length ? `
       <section class="qgroup rise d3">
         <h2 class="qgroup-title">🌱 Warm-ups <span>ease in — these are gentle</span></h2>
-        ${l.warmups.map((q, i) => qCardHTML(l, q, "w" + i, "Warm-up " + (i + 1))).join("")}
-      </section>
+        ${warmups.map((q, i) => qCardHTML(l, q, "w" + i, "Warm-up " + (i + 1))).join("")}
+      </section>` : ""}
 
       <section class="qgroup rise d4">
-        <h2 class="qgroup-title">🌸 Practice <span>10 problems to grow on</span></h2>
-        ${l.practice.map((q, i) => qCardHTML(l, q, "p" + i, "Practice " + (i + 1))).join("")}
+        <h2 class="qgroup-title">🌸 Practice <span>${l.practice.length} problems to grow on</span></h2>
+        ${l.practice.map((q, i) => qCardHTML(l, q, "p" + i, "Problem " + (i + 1))).join("")}
       </section>
 
       <div class="review-foot rise" id="reviewFoot"></div>`;
 
-    // back home
-    view.querySelector("[data-home]").addEventListener("click", e => {
-      e.preventDefault();
-      if (typeof go === "function") go(renderHome); else renderHome();
-    });
+    view.querySelector("[data-home]").addEventListener("click", e => { e.preventDefault(); goHome(); });
 
-    // wire each question
-    const all = [...l.warmups.map((q, i) => ["w" + i, q]), ...l.practice.map((q, i) => ["p" + i, q])];
+    const all = [...warmups.map((q, i) => ["w" + i, q]), ...l.practice.map((q, i) => ["p" + i, q])];
     all.forEach(([qid, q]) => {
       const row = view.querySelector(`.rq[data-qid="${qid}"]`);
       if (!row) return;
@@ -450,7 +466,6 @@
           fb.className = "rq-feedback good";
           fb.innerHTML = `<strong>${pickPraise()}</strong> 🌸`;
           finish();
-          // gentle confetti if available
           if (typeof smallConfetti === "function") { try { smallConfetti(); } catch (e) {} }
         } else {
           fb.className = "rq-feedback try";
@@ -482,12 +497,12 @@
       if (foot && done >= total) {
         foot.innerHTML = `
           <div class="review-done">
-            <p class="rd-title">🌷 Lesson complete!</p>
-            <p>You worked through every warm-up and all ten practice problems. You're ready for next session.</p>
+            <p class="rd-title">🌷 Recap complete!</p>
+            <p>You worked through all ${total} problems from this week's lessons. You're ready for next session.</p>
             <button class="btn btn-primary" id="rdHome">← Back to my garden</button>
           </div>`;
         const h = foot.querySelector("#rdHome");
-        if (h) h.addEventListener("click", () => { if (typeof go === "function") go(renderHome); else renderHome(); });
+        if (h) h.addEventListener("click", goHome);
         if (typeof confettiBurst === "function") { try { confettiBurst(); } catch (e) {} }
       }
     }
@@ -496,11 +511,62 @@
     window.scrollTo({ top: 0 });
   }
 
-  const PRAISE = ["Correct!", "Yes!", "Nailed it.", "Beautiful.", "That's it.", "Right on.", "Lovely work."];
-  function pickPraise() { return PRAISE[Math.floor(Math.random() * PRAISE.length)]; }
+  // ============================================================
+  //  HOME CARD — injected under the hero
+  // ============================================================
+  function homeCardHTML() {
+    const recap = LESSONS.w3recap;
+    const rTotal = recap.practice.length;
+    const rDone = doneCount("w3recap");
+    const rPct = Math.round((rDone / rTotal) * 100);
+    const rComplete = rDone >= rTotal;
+    return `
+      <section class="review-home rise d1" aria-label="Lessons to work on before next session">
+        <div class="review-home-head">
+          <h2>Lessons to work on before next session</h2>
+          <p>Two ways to get sharp: drill your times tables, then recap Week 3. No rush. 🌱</p>
+        </div>
+        <div class="review-cards">
+          <button class="review-card" data-drill="times">
+            <span class="rc-emoji">✖️</span>
+            <span class="rc-body">
+              <span class="rc-kicker">Practice 1 · timed drill</span>
+              <h3>Times Tables (×1–12)</h3>
+              <p>Fifteen minutes of quick facts — 15 seconds each, type the answer, fix any you miss.</p>
+              <span class="rc-count">⏱️ 15 min · 15s per question · 1,000-question bank</span>
+            </span>
+            <span class="rc-go">→</span>
+          </button>
+          <button class="review-card ${rComplete ? "is-complete" : ""}" data-review="w3recap">
+            <span class="rc-emoji">🔁</span>
+            <span class="rc-body">
+              <span class="rc-kicker">Practice 2 · Week 3 recap${rComplete ? " • done 🌸" : ""}</span>
+              <h3>Week 3 Recap</h3>
+              <p>Mixed problems from Tables &amp; the Constant of Proportionality and Equations y = kx.</p>
+              <span class="rc-bar"><span class="rc-bar-fill" style="width:${rPct}%"></span></span>
+              <span class="rc-count">${rDone} / ${rTotal} done</span>
+            </span>
+            <span class="rc-go">→</span>
+          </button>
+        </div>
+      </section>`;
+  }
+
+  function wireHome(root) {
+    root.querySelectorAll("[data-drill]").forEach(b =>
+      b.addEventListener("click", () => {
+        if (typeof go === "function") go(renderTimesDrill); else renderTimesDrill();
+      }));
+    root.querySelectorAll("[data-review]").forEach(b =>
+      b.addEventListener("click", () => {
+        const key = b.dataset.review;
+        if (typeof go === "function") go(() => renderReview(key)); else renderReview(key);
+      }));
+  }
 
   // ---- expose to the app ----
   window.reviewHomeCardHTML = homeCardHTML;
   window.wireReviewHome = wireHome;
   window.renderReview = renderReview;
+  window.renderTimesDrill = renderTimesDrill;
 })();
