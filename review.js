@@ -26,7 +26,25 @@
     if (!rdone[key]) rdone[key] = {};
     rdone[key][qid] = true;
     saveReview(rdone);
+    if (typeof window.scheduleCloudPush === "function") window.scheduleCloudPush();
   }
+
+  // ---- cloud sync hooks (used by cloud.js) ----
+  // Export the recap progress so it rides along in the cloud garden, and
+  // import a remote copy by union (progress only ever grows).
+  window.reviewExport = function () { return rdone; };
+  window.reviewImport = function (remote) {
+    if (!remote || typeof remote !== "object") return false;
+    let changed = false;
+    for (const lk in remote) {
+      if (!rdone[lk]) rdone[lk] = {};
+      for (const qid in remote[lk]) {
+        if (remote[lk][qid] && !rdone[lk][qid]) { rdone[lk][qid] = true; changed = true; }
+      }
+    }
+    if (changed) saveReview(rdone);
+    return changed;
+  };
   function doneCount(key) {
     return rdone[key] ? Object.keys(rdone[key]).length : 0;
   }
@@ -93,7 +111,15 @@
     let qLeft = DRILL.perQuestionSec;
     let cur = null;
     let phase = "ask"; // ask → fix → done
-    const sessionEndAt = Date.now() + DRILL.sessionMin * 60 * 1000;
+    // The 15-minute budget counts ONLY time spent actively answering (phase
+    // "ask"). While the answer is shown and the Continue button is up, the
+    // session clock freezes — so the 15 minutes is pure answering time.
+    const SESSION_MS = DRILL.sessionMin * 60 * 1000;
+    let activeMs = 0;        // active answering time banked so far
+    let askStartedAt = null; // timestamp the current "ask" began (null = paused)
+    const pauseActive = () => {
+      if (askStartedAt != null) { activeMs += Date.now() - askStartedAt; askStartedAt = null; }
+    };
 
     view.innerHTML = `
       <nav class="crumbs rise"><a href="#" data-home>← My garden</a> <span>/ Before next session</span> <span>/ Times Tables</span></nav>
@@ -143,7 +169,8 @@
     // ---- session countdown (whole drill) ----
     drillSessTimer = setInterval(() => {
       if (!aliveOrStop()) return;
-      const left = sessionEndAt - Date.now();
+      const live = askStartedAt != null ? Date.now() - askStartedAt : 0;
+      const left = SESSION_MS - activeMs - live;
       els.clock.textContent = fmtClock(left);
       if (left <= 0) endSession();
     }, 250);
@@ -164,9 +191,10 @@
     }
 
     function nextQuestion() {
-      if (Date.now() >= sessionEndAt) return endSession();
+      if (activeMs >= SESSION_MS) return endSession();
       cur = bank[idx % bank.length]; idx++;
       phase = "ask";
+      askStartedAt = Date.now(); // the clock resumes — they're answering again
       qLeft = DRILL.perQuestionSec;
       els.q.textContent = cur[0] + " × " + cur[1];
       els.input.value = "";
@@ -192,6 +220,7 @@
           return;
         }
         if (drillQTimer) { clearInterval(drillQTimer); drillQTimer = null; }
+        pauseActive(); // freeze the session clock — they've answered
         attempted++;
         if (val === answerOf()) { firstTry++; markRight(); }
         else enterFix(false);
@@ -208,6 +237,7 @@
 
     function timeUp() {
       if (phase !== "ask") return;
+      pauseActive(); // freeze the session clock — the 15s ran out
       attempted++;
       enterFix(true);
     }
