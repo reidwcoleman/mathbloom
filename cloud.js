@@ -1,35 +1,27 @@
 /* ============================================================
-   MathBloom — cloud saves on Firebase ("garden codes")
+   MathBloom — automatic worldwide cloud sync (no codes, no login)
    Backed by the famsync-62653 Realtime Database (anonymous auth).
-   Local-first: localStorage stays the source of truth on-device;
-   the cloud copy lets one garden follow you anywhere in the world,
-   and a live listener keeps every linked device in sync in real time.
 
-   The garden code (e.g. "fern-tulip-482") is the per-garden secret.
-   Data lives at  mathbloom_gardens/{code}  and holds BOTH the lesson
-   garden (progress) and the "before next session" recap progress.
+   There is ONE shared garden for everyone — at  mathbloom_gardens/global.
+   Every device, anywhere in the world, reads and writes that same garden
+   automatically on load: progress just appears, with nothing to set up or
+   save. A live onValue listener keeps every open device in sync in real
+   time. localStorage is still the on-device cache so it works offline; the
+   merge only ever grows progress, never erases it.
 
    RTDB rule (DEPLOYED 2026-06-22): mathbloom_gardens/$code allows
-   read+write for authenticated (anonymous) users, living alongside
-   cham_rooms (Hue & Seek). If cloud writes ever fail with "permission
-   denied," confirm that rule still exists in
-   famsync-62653 → Realtime Database → Rules. If the cloud is unreachable
-   for any reason, MathBloom just stays local — nothing is lost.
+   read+write for authenticated (anonymous) users. The fixed id "global"
+   matches $code, so no extra rule is needed.
+
+   Note: because there's no identity, the garden is shared by anyone who
+   opens the site — perfect for one family across devices; not private per
+   visitor. (To go per-user later, swap GARDEN_ID for a synced code.)
    ============================================================ */
 
 const CLOUD_PATH = "mathbloom_gardens";
-const SYNC_KEY = "mathbloom-sync-code";
+const GARDEN_ID = "global"; // one garden, the same on every device worldwide
 
-const CODE_WORDS = [
-  "fern", "tulip", "daisy", "clover", "maple", "willow", "poppy", "petal",
-  "moss", "brook", "acorn", "robin", "sunny", "meadow", "berry", "cedar",
-  "lily", "rose", "sage", "hazel", "birch", "bloom", "sprout", "pebble",
-  "honey", "apple", "peach", "plum", "olive", "ivy", "basil", "mint",
-  "dewy", "leafy", "seed", "twig", "root", "vine", "garden", "sunbeam"
-];
-
-let syncCode = localStorage.getItem(SYNC_KEY) || null;
-let syncStatus = syncCode ? "idle" : "off"; // off | idle | syncing | synced | error
+let syncStatus = "idle"; // idle | syncing | synced | error
 let pushTimer = null;
 
 // ---------- Firebase plumbing ----------
@@ -51,14 +43,7 @@ function initFirebase() {
   return _authReady;
 }
 
-function gardenRef(code) { return _db.ref(`${CLOUD_PATH}/${code}`); }
-
-function genGardenCode() {
-  const w = () => CODE_WORDS[Math.floor(Math.random() * CODE_WORDS.length)];
-  let a = w(), b = w();
-  while (b === a) b = w();
-  return `${a}-${b}-${100 + Math.floor(Math.random() * 900)}`;
-}
+function gardenRef() { return _db.ref(`${CLOUD_PATH}/${GARDEN_ID}`); }
 
 // ---------- the full garden = lesson progress + recap progress ----------
 function gatherState() {
@@ -104,30 +89,24 @@ function applyRemote(remote) {
   return changed;
 }
 
-async function cloudFetch(code) {
+async function cloudPush() {
   await initFirebase();
-  const snap = await gardenRef(code).once("value");
-  return snap.val();
-}
-async function cloudPush(code) {
-  await initFirebase();
-  await gardenRef(code).set({
+  await gardenRef().set({
     ...gatherState(),
     updated_at: firebase.database.ServerValue.TIMESTAMP
   });
 }
 
-// ---------- live, real-time sync across every linked device ----------
-function attachLive(code) {
-  if (!_db || !code) return;
+// ---------- live, real-time sync across every device ----------
+function attachLive() {
+  if (!_db) return;
   detachLive();
-  _liveRef = gardenRef(code);
+  _liveRef = gardenRef();
   _liveRef.on("value", snap => {
-    const changed = applyRemote(snap.val());
-    if (changed) {
+    if (applyRemote(snap.val())) {
       _localSave();
-      // only redraw if the garden home is what's on screen (don't yank a
-      // student out of a lesson mid-thought)
+      // only redraw if the garden home is on screen (don't yank a student
+      // out of a lesson mid-thought)
       if (document.querySelector(".review-home") && typeof renderHome === "function") renderHome();
     }
   }, () => setSyncStatus("error"));
@@ -140,32 +119,25 @@ function setSyncStatus(s) {
   syncStatus = s;
   const btn = document.getElementById("syncBtn");
   if (btn) {
-    btn.textContent = s === "off" ? "☁️" : s === "syncing" ? "⏳" : s === "error" ? "☁️" : "☁️✓";
-    btn.title = s === "off" ? "Cloud save — set up a garden code"
-      : s === "syncing" ? "Saving to the cloud…"
-      : s === "error" ? "Cloud save: will retry — your progress is safe on this device"
-      : `Cloud save on (${syncCode})`;
+    btn.textContent = s === "syncing" ? "⏳" : s === "error" ? "☁️" : "☁️✓";
+    btn.title = s === "syncing" ? "Syncing…"
+      : s === "error" ? "Offline — your progress is safe on this device and will sync when you're back online"
+      : "Synced — the same on every device";
   }
   const stat = document.getElementById("syncStatusLine");
-  if (stat) stat.textContent = s === "syncing" ? "Saving to the cloud…"
-    : s === "synced" ? "✓ Saved to the cloud — synced everywhere"
-    : s === "error" ? "Couldn't reach the cloud — will retry automatically. Everything is still saved on this device."
-    : "Cloud save is on. Your garden syncs across your devices automatically.";
+  if (stat) stat.textContent = s === "syncing" ? "Syncing…"
+    : s === "synced" ? "✓ Synced — the same on every device, everywhere"
+    : s === "error" ? "Offline right now — everything is saved on this device and will sync automatically when you're back online."
+    : "Your garden syncs automatically. Nothing to set up.";
 }
 
 function scheduleCloudPush() {
-  if (!syncCode) return;
   clearTimeout(pushTimer);
   setSyncStatus("syncing");
   pushTimer = setTimeout(async () => {
-    try {
-      await cloudPush(syncCode);
-      setSyncStatus("synced");
-    } catch (e) {
-      console.warn("cloud push failed", e);
-      setSyncStatus("error");
-    }
-  }, 1200);
+    try { await cloudPush(); setSyncStatus("synced"); }
+    catch (e) { console.warn("cloud push failed", e); setSyncStatus("error"); }
+  }, 1000);
 }
 // let review.js trigger a push when recap progress changes
 window.scheduleCloudPush = scheduleCloudPush;
@@ -177,108 +149,15 @@ saveProgress = function () {
   scheduleCloudPush();
 };
 
-// ---------- sync panel UI ----------
+// ---------- sync panel UI (informational — there's nothing to configure) ----------
 const syncOverlay = document.getElementById("syncOverlay");
 const syncBody = document.getElementById("syncBody");
 
 function renderSyncPanel() {
-  if (!syncCode) {
-    syncBody.innerHTML = `
-      <p class="calm-sub" style="margin-top:0">Right now your garden lives in this browser only. A <strong>garden code</strong> saves it to the cloud, so it's the same on your phone, a school computer — anywhere in the world.</p>
-      <div class="sync-block">
-        <button class="btn btn-primary" id="makeCode">🌱 Create my garden code</button>
-        <p class="sync-note">No email, no password, nothing to sign up for.</p>
-      </div>
-      <div class="sync-divider"><span>or</span></div>
-      <div class="sync-block">
-        <p class="sync-label">Already have a code from another device?</p>
-        <div class="answer-row" style="justify-content:center">
-          <input class="answer-input sync-input" id="codeInput" placeholder="fern-tulip-482" autocomplete="off" autocapitalize="none">
-        </div>
-        <button class="btn btn-soft" id="loadCode" style="margin-top:10px">Load my garden</button>
-        <p class="sync-note" id="loadMsg"></p>
-      </div>`;
-    syncBody.querySelector("#makeCode").addEventListener("click", createGarden);
-    syncBody.querySelector("#loadCode").addEventListener("click", loadGarden);
-    syncBody.querySelector("#codeInput").addEventListener("keydown", e => { if (e.key === "Enter") loadGarden(); });
-  } else {
-    syncBody.innerHTML = `
-      <p class="calm-sub" style="margin-top:0">This is your garden code. Type it into MathBloom on any device and your whole garden — blooms, petals, recap progress, everything — appears there too, live.</p>
-      <div class="sync-code" id="syncCodeBox">${syncCode}</div>
-      <p class="sync-note" id="syncStatusLine"></p>
-      <div class="q-actions" style="justify-content:center">
-        <button class="btn btn-primary" id="copyCode">Copy my code</button>
-        <button class="btn btn-ghost" id="unlink">Stop cloud save on this device</button>
-      </div>
-      <p class="sync-note">Tip: write it somewhere safe, like the inside of a notebook. 📓</p>`;
-    setSyncStatus(syncStatus === "off" ? "idle" : syncStatus);
-    syncBody.querySelector("#copyCode").addEventListener("click", async () => {
-      try { await navigator.clipboard.writeText(syncCode); toast("Code copied ✓"); }
-      catch { toast("Select and copy the code above"); }
-    });
-    syncBody.querySelector("#unlink").addEventListener("click", () => {
-      detachLive();
-      syncCode = null;
-      localStorage.removeItem(SYNC_KEY);
-      setSyncStatus("off");
-      renderSyncPanel();
-      toast("Cloud save off — progress stays on this device");
-    });
-  }
-}
-
-function cloudErrorNote(e) {
-  return (e && /permission/i.test(String(e.message || e)))
-    ? "Cloud save isn't switched on for MathBloom yet (the database needs a one-time rule). Your progress is safe on this device."
-    : "Hmm, couldn't reach the cloud — check the internet and try again. Your progress is safe on this device either way.";
-}
-
-async function createGarden() {
-  const btn = syncBody.querySelector("#makeCode");
-  btn.disabled = true;
-  btn.textContent = "Planting your code…";
-  try {
-    let code = genGardenCode();
-    // avoid the (rare) case the code is taken
-    for (let i = 0; i < 3 && (await cloudFetch(code)); i++) code = genGardenCode();
-    syncCode = code;
-    await cloudPush(code);
-    localStorage.setItem(SYNC_KEY, code);
-    setSyncStatus("synced");
-    attachLive(code);
-    renderSyncPanel();
-    smallConfetti();
-  } catch (e) {
-    console.warn(e);
-    syncCode = null;
-    btn.disabled = false;
-    btn.textContent = "🌱 Create my garden code";
-    syncBody.insertAdjacentHTML("beforeend", `<p class="sync-note" style="color:var(--amber)">${cloudErrorNote(e)}</p>`);
-  }
-}
-
-async function loadGarden() {
-  const input = syncBody.querySelector("#codeInput");
-  const msg = syncBody.querySelector("#loadMsg");
-  const code = input.value.trim().toLowerCase().replace(/\s+/g, "");
-  if (!code) { msg.textContent = "Type your code first — like fern-tulip-482."; return; }
-  msg.textContent = "Looking for your garden…";
-  try {
-    const remote = await cloudFetch(code);
-    if (!remote) { msg.textContent = "No garden found with that code — double-check the spelling and dashes."; return; }
-    applyRemote(remote);
-    syncCode = code;
-    localStorage.setItem(SYNC_KEY, code);
-    saveProgress();   // persists locally + pushes the merged garden back up
-    attachLive(code);
-    renderSyncPanel();
-    renderHome();
-    toast("Your garden is here 🌸");
-    bigConfetti();
-  } catch (e) {
-    console.warn(e);
-    msg.textContent = cloudErrorNote(e);
-  }
+  syncBody.innerHTML = `
+    <p class="calm-sub" style="margin-top:0">Your garden saves to the cloud and is <strong>the same on every device, anywhere in the world</strong> — automatically. No code, no sign-in, nothing to remember. Just open MathBloom and keep growing. 🌱</p>
+    <p class="sync-note" id="syncStatusLine"></p>`;
+  setSyncStatus(syncStatus);
 }
 
 document.getElementById("syncBtn").addEventListener("click", () => {
@@ -289,22 +168,21 @@ document.getElementById("syncClose").addEventListener("click", () => { syncOverl
 syncOverlay.addEventListener("click", e => { if (e.target === syncOverlay) syncOverlay.hidden = true; });
 addEventListener("keydown", e => { if (e.key === "Escape" && !syncOverlay.hidden) syncOverlay.hidden = true; });
 
-// ---------- boot: pull the cloud garden + go live if this device is linked ----------
+// ---------- boot: pull the shared garden, merge, push, and go live ----------
 (async function bootSync() {
-  setSyncStatus(syncCode ? "idle" : "off");
-  if (!syncCode) return;
+  setSyncStatus("syncing");
   try {
-    setSyncStatus("syncing");
-    const remote = await cloudFetch(syncCode);
-    if (applyRemote(remote)) {
+    await initFirebase();
+    const snap = await gardenRef().once("value");
+    if (applyRemote(snap.val())) {
       _localSave();
       if (typeof renderHome === "function") renderHome();
     }
-    await cloudPush(syncCode);
-    attachLive(syncCode);
+    await cloudPush();   // seed/merge this device's progress into the shared garden
+    attachLive();        // real-time from here on
     setSyncStatus("synced");
   } catch (e) {
-    console.warn("boot sync failed", e);
+    console.warn("cloud sync unavailable", e);
     setSyncStatus("error");
   }
 })();
